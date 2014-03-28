@@ -228,3 +228,38 @@ function Test-GetResourceForNonExisingResource
 		Remove-AzureResourceGroup -Name $rgname -Force
 	}
 }
+
+<#
+.SYNOPSIS
+Tests get resources via piping from resource group
+#>
+function Test-GetResourcesViaPipingFromAnotherResource
+{
+	# Setup
+	$rgname = Get-ResourceGroupName
+	$rnameParent = Get-ResourceName
+	$rnameChild = Get-ResourceName
+	$resourceTypeParent = "Microsoft.Sql/servers"
+	$resourceTypeChild = "Microsoft.Sql/servers/databases"
+	$rglocation = Get-ProviderLocation ResourceManagement
+	$location = Get-ProviderLocation $resourceTypeParent
+	$apiversion = "2014-04-01"
+
+	# Test
+	try 
+	{
+		New-AzureResourceGroup -Name $rgname -Location $rglocation
+		New-AzureResource -Name $rnameParent -Location $location -ResourceGroupName $rgname -ResourceType $resourceTypeParent -PropertyObject @{"administratorLogin" = "adminuser"; "administratorLoginPassword" = "P@ssword1"} -ApiVersion $apiversion		
+		New-AzureResource -Name $rnameChild -Location $location -ResourceGroupName $rgname -ResourceType $resourceTypeChild -ParentResource servers/$rnameParent -PropertyObject @{"edition" = "Web"; "collation" = "SQL_Latin1_General_CP1_CI_AS"; "maxSizeBytes" = "1073741824"} -ApiVersion $apiversion
+		
+		$list = Get-AzureResource -ResourceGroupName $rgname | Get-AzureResource -ApiVersion $apiversion
+		
+		# Assert
+		Assert-AreEqual 2 $list.Count
+	}
+	finally
+	{
+		# Cleanup
+		Remove-AzureResourceGroup -Name $rgname -Force
+	}
+}

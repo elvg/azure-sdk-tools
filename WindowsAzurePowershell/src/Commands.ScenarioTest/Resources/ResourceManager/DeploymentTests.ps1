@@ -29,7 +29,39 @@ function Test-ValidateDeployment
 	{
 		New-AzureResourceGroup -Name $rgname -Location $rglocation
 		
-		Test-AzureResourceGroupTemplate -ResourceGroupName $rgname -TemplateFile Build2014_Website_App.json -siteName $rname -hostingPlanName $rname -siteLocation $location -sku free -workerSize 0		
+		$list = Test-AzureResourceGroupTemplate -ResourceGroupName $rgname -TemplateFile Build2014_Website_App.json -siteName $rname -hostingPlanName $rname -siteLocation $location -sku Free -workerSize 0
+
+		# Assert
+		Assert-AreEqual 0 $list.Count
+	}
+	finally
+	{
+		# Cleanup
+		Remove-AzureResourceGroup -Name $rgname -Force
+	}
+}
+
+<#
+.SYNOPSIS
+Tests deployment via template file and parameter object.
+#>
+function Test-NewDeploymentFromTemplateFile
+{
+	# Setup
+	$rgname = Get-ResourceGroupName
+	$rname = Get-ResourceName
+	$rglocation = Get-ProviderLocation ResourceManagement
+	$location = Get-ProviderLocation "Microsoft.Web/sites"
+
+	# Test
+	try 
+	{
+		New-AzureResourceGroup -Name $rgname -Location $rglocation
+		
+		$deployment = New-AzureResourceGroupDeployment -ResourceGroupName $rgname -TemplateFile Build2014_Website_App.json -siteName $rname -hostingPlanName $rname -siteLocation $location -sku Free -workerSize 0
+
+		# Assert
+		Assert-AreEqual Succeeded $deployment.ProvisioningState
 	}
 	finally
 	{

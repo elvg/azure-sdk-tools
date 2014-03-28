@@ -51,5 +51,13 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         {
             RunPowerShellTest("Test-ValidateDeployment");
         }
+
+        [TestMethod]
+        [TestCategory(Category.All)]
+        [TestCategory(Category.ResourceManager)]
+        public void TestNewDeploymentFromTemplateFile()
+        {
+            RunPowerShellTest("Test-NewDeploymentFromTemplateFile");
+        }
     }
 }

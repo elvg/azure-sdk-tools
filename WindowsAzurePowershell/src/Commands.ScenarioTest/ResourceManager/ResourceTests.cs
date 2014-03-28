@@ -99,5 +99,13 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         {
             RunPowerShellTest("Test-GetResourceForNonExisingResource");
         }
+
+        [TestMethod]
+        [TestCategory(Category.All)]
+        [TestCategory(Category.ResourceManager)]
+        public void TestGetResourcesViaPipingFromAnotherResource()
+        {
+            RunPowerShellTest("Test-GetResourcesViaPipingFromAnotherResource");
+        }
     }
 }
