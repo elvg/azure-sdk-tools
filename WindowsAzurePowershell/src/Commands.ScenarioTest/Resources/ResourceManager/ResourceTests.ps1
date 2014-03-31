@@ -22,15 +22,15 @@ function Test-CreatesNewSimpleResource
 	$rgname = Get-ResourceGroupName
 	$rname = Get-ResourceName
 	$rglocation = Get-ProviderLocation ResourceManagement
-	$location = Get-ProviderLocation "Microsoft.Web/sites"
+	$location = Get-ProviderLocation "Microsoft.Sql/servers"
 	$apiversion = "2014-04-01"
-	$resourceType = "Microsoft.Web/sites"
+	$resourceType = "Microsoft.Sql/servers"
 
 	# Test
 	try 
 	{
 		New-AzureResourceGroup -Name $rgname -Location $rglocation
-		$actual = New-AzureResource -Name $rname -Location $location -ResourceGroupName $rgname -ResourceType $resourceType -PropertyObject @{"name" = $name; "siteMode" = "Limited"; "computeMode" = "Shared"} -ApiVersion $apiversion
+		$actual = New-AzureResource -Name $rname -Location $location -ResourceGroupName $rgname -ResourceType $resourceType -PropertyObject @{"administratorLogin" = "adminuser"; "administratorLoginPassword" = "P@ssword1"} -ApiVersion $apiversion
 		$expected = Get-AzureResource -Name $rname -ResourceGroupName $rgname -ResourceType $resourceType -ApiVersion $apiversion
 	
 		$list = Get-AzureResource -ResourceGroupName $rgname

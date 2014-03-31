@@ -24,27 +24,25 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 {
     public class HttpMockServer : DelegatingHandler
     {
-        private static string namesPath = "assetNames.json";
-
-        private static string recordDir = "SessionRecords";
-
-        private static string modeEnvironmentVariableName = "AZURE_TEST_MODE";
-
-        private static AssetNames names;
-
-        private static List<RecordEntry> sessionRecords;
-
-        private static int instanceCount;
-
-        public static HttpRecorderMode Mode { get; set; }
-
-        public static bool CleanRecordsDirectory { get; set; }
-
-        public static string OutputDirectory { get; set; }
-
+        private const string recordDir = "SessionRecords";
+        private const string modeEnvironmentVariableName = "AZURE_TEST_MODE";
+        private AssetNames names;
+        private List<RecordEntry> sessionRecords;
         private IRecordMatcher matcher;
 
-        public Records Records { get; private set; }
+        private static HttpMockServer instance = null;
+        public static HttpMockServer Instance
+        {
+            get { return instance; }
+        }
+        
+        public HttpRecorderMode Mode { get; set; }
+
+        public bool CleanRecordsDirectory { get; set; }
+
+        public string OutputDirectory { get; set; }
+
+        public string Identity { get; set; }
 
         public string RecordsDirectory
         {
@@ -53,17 +51,19 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                 string dirName = Path.Combine(recordDir, Identity);
                 if (Mode == HttpRecorderMode.Record)
                 {
-                    dirName = Path.Combine(OutputDirectory, dirName);
+                    if (OutputDirectory != null)
+                    {
+                        dirName = Path.Combine(OutputDirectory, dirName);
+                    }
                 }
                 return dirName;
             }
         }
 
-        public string Identity { get; private set; }
+        public Records Records { get; private set; }
 
         private static HttpRecorderMode GetCurrentMode()
         {
-
             string input =  Environment.GetEnvironmentVariable(modeEnvironmentVariableName);
             HttpRecorderMode mode;
 
@@ -107,22 +107,29 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public static string GetAssetName(string testName, string prefix)
         {
-            if (Mode == HttpRecorderMode.Playback)
+            var server = Instance;
+
+            if (server == null)
             {
-                return names[testName].Dequeue();
+                throw new ApplicationException("HttpMockServer has not been started.");
+            }
+
+            if (server.Mode == HttpRecorderMode.Playback)
+            {
+                return server.names[testName].Dequeue();
             }
             else
             {
                 string generated = prefix + new Random().Next(9999);
 
-                if (names.ContainsKey(testName))
+                if (server.names.ContainsKey(testName))
                 {
-                    while (names[testName].Any(n => n.Equals(generated)))
+                    while (server.names[testName].Any(n => n.Equals(generated)))
                     {
                         generated = prefix + new Random().Next(9999);
                     }
                 }
-                names.Enqueue(testName, generated);
+                server.names.Enqueue(testName, generated);
 
                 return generated;
             }
@@ -131,9 +138,8 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            instanceCount--;
 
-            if (Mode == HttpRecorderMode.Record && instanceCount == 0)
+            if (Mode == HttpRecorderMode.Record)
             {
                 Utilities.EnsureDirectoryExists(RecordsDirectory);
 
@@ -141,32 +147,17 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                 {
                     Utilities.CleanDirectory(RecordsDirectory);
                 }
-                
-                int count = 0;
-                const int packSize = 20;
-                List<RecordEntry> pack = new List<RecordEntry>();
+
+                RecordEntryPack pack = new RecordEntryPack();
 
                 foreach (RecordEntry recordEntry in sessionRecords)
                 {
-                    pack.Add(recordEntry);
-
-                    if (pack.Count == packSize)
-                    {
-                        Utilities.SerializeJson<List<RecordEntry>>(
-                            pack,
-                            Path.Combine(RecordsDirectory, string.Format("record{0}.json", count++)));
-                        pack.Clear();
-                    }
+                    pack.Entries.Add(recordEntry);
                 }
 
-                if (pack.Count != 0)
-                {
-                    Utilities.SerializeJson<List<RecordEntry>>(
-                        pack,
-                        Path.Combine(RecordsDirectory, string.Format("record{0}.json", count++)));
-                }
+                pack.Names = names.Names;
 
-                Utilities.SerializeJson(names.Names, namesPath);
+                pack.Serialize(Path.Combine(RecordsDirectory, string.Format("record-{0:yyyyMMddHHmmss}.json", DateTime.Now)));
             }
         }
 
@@ -178,35 +169,39 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             }
         }
 
-        static HttpMockServer()
+        private HttpMockServer() {}
+
+        public static void Initialize(IRecordMatcher matcher, Type callerIdentity)
         {
-            names = new AssetNames();
-            sessionRecords = new List<RecordEntry>();
-            instanceCount = 0;
-            CleanRecordsDirectory = false;
-            Mode = GetCurrentMode();
+            HttpMockServer server = new HttpMockServer();
+            server.names = new AssetNames();
+            server.sessionRecords = new List<RecordEntry>();
+            server.CleanRecordsDirectory = true;
+            server.Mode = GetCurrentMode();
+
+            server.matcher = matcher;
+            server.Identity = callerIdentity.Name;
+            server.Records = new Records(matcher);
+
+            instance = server;
         }
 
-        public HttpMockServer(IRecordMatcher matcher, Type callerIdentity)
+        public void Start()
         {
-            instanceCount++;
-            this.matcher = matcher;
-            this.Identity = callerIdentity.Name;
-            this.Records = new Records(matcher);
-
             if (Mode == HttpRecorderMode.Playback)
             {
                 if (Directory.Exists(RecordsDirectory))
                 {
-                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory))
+                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory, "record-*.json"))
                     {
-                        sessionRecords.AddRange(Utilities.DeserializeJson<List<RecordEntry>>(recordsFile));
+                        RecordEntryPack pack = RecordEntryPack.Deserialize(recordsFile);
+                        sessionRecords.AddRange(pack.Entries);
+                        foreach (var func in pack.Names.Keys)
+                        {
+                            pack.Names[func].ForEach(n => names.Enqueue(func, n));
+                        }
                     }
                 }
-
-                Dictionary<string, string[]> savedNames = Utilities.DeserializeJson<Dictionary<string, string[]>>(namesPath)
-                    ?? new Dictionary<string, string[]>();
-                savedNames.ForEach(r => names.Enqueue(r.Key, r.Value));
                 Records.EnqueueRange(sessionRecords);
             }
         }

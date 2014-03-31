@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Xml.Linq;
 using Newtonsoft.Json;
@@ -105,21 +106,29 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public static void SerializeJson<T>(T data, string path)
         {
-            File.WriteAllText(path, JsonConvert.SerializeObject(data));
+            File.WriteAllText(path, JsonConvert.SerializeObject(data, Formatting.None, new JsonSerializerSettings
+                {
+                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
+                    TypeNameHandling = TypeNameHandling.None
+                }));
         }
 
         public static T DeserializeJson<T>(string path)
         {
             string json = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
+                {
+                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
+                    TypeNameHandling = TypeNameHandling.None
+                });
         }
 
         public static void CleanDirectory(string dir)
         {
             if (Directory.Exists(dir))
             {
-                foreach (string file in Directory.GetFiles("*")) File.Delete(file);
-                foreach (string subDirectory in Directory.GetDirectories("*")) Directory.Delete(subDirectory, true);
+                foreach (string file in Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories)) File.Delete(file);
+                foreach (string subDirectory in Directory.GetDirectories(dir, "*", SearchOption.AllDirectories)) Directory.Delete(subDirectory, true);
             }
         }
 

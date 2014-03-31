@@ -176,6 +176,7 @@
     <Compile Include="Common\GeneralTests.cs" />
     <Compile Include="Common\JsonUtilitiesTests.cs" />
     <Compile Include="Common\MockCommandRuntime.cs" />
+    <Compile Include="Common\MockProfileStore.cs" />
     <Compile Include="Common\MockStorageService.cs" />
     <Compile Include="Common\PSObjectExtensions.cs" />
     <Compile Include="Common\RemoveAzurePublishSettings.cs" />

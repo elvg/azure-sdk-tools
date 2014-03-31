@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetNames.cs" />
+    <Compile Include="RecordEntryPack.cs" />
     <Compile Include="HttpMockServer.cs" />
     <Compile Include="HttpRecorderMode.cs" />
     <Compile Include="IRecordMatcher.cs" />

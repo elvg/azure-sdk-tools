@@ -26,18 +26,12 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
     public class WindowsAzurePowerShellCertificateTest : PowerShellTest
     {
         protected TestCredentialHelper credentials;
-        
         protected string credentialFile;
-
         protected string profileFile;
-        
-        protected List<HttpMockServer> mockServers;
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)
         {
-            HttpMockServer mockServer = new HttpMockServer(new SimpleRecordMatcher(), this.GetType());
-            e.AddHandlerToClient(mockServer);
-            mockServers.Add(mockServer);
+            e.AddHandlerToClient(HttpMockServer.Instance);
         }
 
         public WindowsAzurePowerShellCertificateTest(params string[] modules)
@@ -46,13 +40,17 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             this.credentials = new TestCredentialHelper(Environment.CurrentDirectory);
             this.credentialFile = TestCredentialHelper.DefaultCredentialFile;
             this.profileFile = TestCredentialHelper.WindowsAzureProfileFile;
+
+            HttpMockServer.Initialize(new SimpleRecordMatcher(), this.GetType());
+            HttpMockServer.Instance.Mode = HttpRecorderMode.Record;
+            HttpMockServer.Instance.CleanRecordsDirectory = false;
+            HttpMockServer.Instance.Start();
         }
 
         [TestInitialize]
         public override void TestSetup()
         {
             base.TestSetup();
-            this.mockServers = new List<HttpMockServer>();
             WindowsAzureSubscription.OnClientCreated += OnClientCreated;
             this.credentials.SetupPowerShellEnvironment(powershell, this.credentialFile, this.profileFile);
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (se, cert, chain, sslerror) =>
@@ -67,7 +65,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
         {
             base.TestCleanup();
             WindowsAzureSubscription.OnClientCreated -= OnClientCreated;
-            mockServers.ForEach(ms => ms.Dispose());
+            HttpMockServer.Instance.Dispose();
         }
     }
 }

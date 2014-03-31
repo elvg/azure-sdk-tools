@@ -13,6 +13,8 @@
 // ----------------------------------------------------------------------------------
 
 
+using System;
+
 namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
 {
     using System.Collections.Generic;
@@ -26,30 +28,28 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
     [TestClass]
     public class WindowsAzurePowerShellTokenTest : PowerShellTest
     {
-        protected List<HttpMockServer> mockServers;
         private static string testEnvironmentName = "__test-environment";
-        protected HttpRecorderMode MockServerRecordingMode = HttpRecorderMode.None;
+        private static string outputDirKey = "TEST_HTTPMOCK_OUTPUT";
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)
         {
-            HttpMockServer mockServer = new HttpMockServer(new SimpleRecordMatcher(), this.GetType());
-
-            HttpMockServer.Mode = MockServerRecordingMode;
-            HttpMockServer.OutputDirectory = @"D:\Code\GitHub\azure-sdk-tools-pr\WindowsAzurePowershell\src\Commands.ScenarioTest\Resources\SessionRecords";
-
-            e.AddHandlerToClient(mockServer);
-            mockServers.Add(mockServer);
+            e.AddHandlerToClient(HttpMockServer.Instance);
         }
 
         public WindowsAzurePowerShellTokenTest(params string[] modules)
             : base(modules)
-        { }
+        {
+            HttpMockServer.Initialize(new SimpleRecordMatcher(), this.GetType());
+            HttpMockServer.Instance.Mode = HttpRecorderMode.Record;
+            HttpMockServer.Instance.CleanRecordsDirectory = false;
+            HttpMockServer.Instance.OutputDirectory = Environment.GetEnvironmentVariable(outputDirKey);
+            HttpMockServer.Instance.Start();
+        }
 
         [TestInitialize]
         public override void TestSetup()
         {
             base.TestSetup();
-            this.mockServers = new List<HttpMockServer>();
             WindowsAzureSubscription.OnClientCreated += OnClientCreated;
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (se, cert, chain, sslerror) =>
             {
@@ -109,9 +109,8 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
         {
             base.TestCleanup();
             WindowsAzureSubscription.OnClientCreated -= OnClientCreated;
-            mockServers.ForEach(ms => ms.Dispose());
-
             WindowsAzureProfile.Instance.RemoveEnvironment(testEnvironmentName);
+            HttpMockServer.Instance.Dispose();
         }
     }
 }

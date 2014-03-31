@@ -29,9 +29,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         public ResourceTests()
             : base("ResourceManager\\Common.ps1",
                    "ResourceManager\\ResourceTests.ps1")
-        {
-            MockServerRecordingMode = HttpRecorderMode.Record;
-        }
+        { }
 
         [TestInitialize]
         public override void TestSetup()
