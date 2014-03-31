@@ -114,14 +114,21 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             return JsonConvert.DeserializeObject<T>(json);
         }
 
-        public static void RecreateDirectory(string dir)
+        public static void CleanDirectory(string dir)
         {
             if (Directory.Exists(dir))
             {
-                Directory.Delete(dir, true);
+                foreach (string file in Directory.GetFiles("*")) File.Delete(file);
+                foreach (string subDirectory in Directory.GetDirectories("*")) Directory.Delete(subDirectory, true);
             }
+        }
 
-            Directory.CreateDirectory(dir);
+        public static void EnsureDirectoryExists(string dir)
+        {
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
         }
     }
 }

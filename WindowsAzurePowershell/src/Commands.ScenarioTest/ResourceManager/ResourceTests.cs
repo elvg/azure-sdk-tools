@@ -12,11 +12,14 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Microsoft.WindowsAzure.Commands.Utilities.Common;
+
 namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
 {
     using System.IO;
     using Commands.ScenarioTest.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.WindowsAzure.Utilities.HttpRecorder;
 
     [TestClass]
     public class ResourceTests : WindowsAzurePowerShellTokenTest
@@ -27,7 +30,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
             : base("ResourceManager\\Common.ps1",
                    "ResourceManager\\ResourceTests.ps1")
         {
-            
+            MockServerRecordingMode = HttpRecorderMode.Record;
         }
 
         [TestInitialize]

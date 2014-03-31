@@ -13,27 +13,30 @@
 // ----------------------------------------------------------------------------------
 
 
-using Microsoft.WindowsAzure.Commands.Test.Utilities.Common;
-
 namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
 {
-    using System;
     using System.Collections.Generic;
     using VisualStudio.TestTools.UnitTesting;
     using Commands.Common;
-    using Microsoft.WindowsAzure.Utilities.HttpRecorder;
-    using Microsoft.WindowsAzure.Commands.Utilities.Common;
+    using WindowsAzure.Utilities.HttpRecorder;
+    using Utilities.Common;
+    using Commands.Common.Test.Common;
+    using Test.Utilities.Common;
 
     [TestClass]
     public class WindowsAzurePowerShellTokenTest : PowerShellTest
     {
         protected List<HttpMockServer> mockServers;
-        private string userName;
         private static string testEnvironmentName = "__test-environment";
+        protected HttpRecorderMode MockServerRecordingMode = HttpRecorderMode.None;
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)
         {
-            HttpMockServer mockServer = new HttpMockServer(new SimpleRecordMatcher());
+            HttpMockServer mockServer = new HttpMockServer(new SimpleRecordMatcher(), this.GetType());
+
+            HttpMockServer.Mode = MockServerRecordingMode;
+            HttpMockServer.OutputDirectory = @"D:\Code\GitHub\azure-sdk-tools-pr\WindowsAzurePowershell\src\Commands.ScenarioTest\Resources\SessionRecords";
+
             e.AddHandlerToClient(mockServer);
             mockServers.Add(mockServer);
         }
@@ -53,6 +56,18 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
                 return true;
             };
 
+            WindowsAzureProfile.Instance = new WindowsAzureProfile(new MockProfileStore());
+
+            if (!WindowsAzureProfile.Instance.Environments.ContainsKey(testEnvironmentName))
+            {
+                WindowsAzureProfile.Instance.AddEnvironment(new WindowsAzureEnvironment { Name = testEnvironmentName });
+            }
+
+            SetupAzureEnvironmentFromEnvironmentVariables();
+        }
+
+        private void SetupAzureEnvironmentFromEnvironmentVariables()
+        {
             ServiceManagementTestEnvironmentFactory serviceManagementTestEnvironmentFactory = new ServiceManagementTestEnvironmentFactory();
             TestEnvironment rdfeEnvironment = serviceManagementTestEnvironmentFactory.GetTestEnvironment();
             ResourceManagerTestEnvironmentFactory resourceManagerTestEnvironmentFactory = new ResourceManagerTestEnvironmentFactory();
@@ -60,18 +75,6 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             string jwtToken = ((TokenCloudCredentials)csmEnvironment.Credentials).Token;
 
             WindowsAzureProfile.Instance.TokenProvider = new FakeAccessTokenProvider(jwtToken, csmEnvironment.UserName);
-
-            userName = csmEnvironment.UserName;
-
-            CreateTestAzureEnvironment(csmEnvironment, rdfeEnvironment);
-        }
-
-        private void CreateTestAzureEnvironment(TestEnvironment csmEnvironment, TestEnvironment rdfeEnvironment)
-        {
-            if (!WindowsAzureProfile.Instance.Environments.ContainsKey(testEnvironmentName))
-            {
-                WindowsAzureProfile.Instance.AddEnvironment(new WindowsAzureEnvironment {Name = testEnvironmentName});
-            }
 
             WindowsAzureProfile.Instance.CurrentEnvironment = WindowsAzureProfile.Instance.Environments[testEnvironmentName];
 

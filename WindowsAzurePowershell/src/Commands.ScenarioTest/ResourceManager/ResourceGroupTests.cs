@@ -17,6 +17,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
     using System.IO;
     using Commands.ScenarioTest.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.WindowsAzure.Utilities.HttpRecorder;
 
     [TestClass]
     public class ResourceGroupTests : WindowsAzurePowerShellTokenTest
@@ -27,7 +28,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
             : base("ResourceManager\\Common.ps1",
                    "ResourceManager\\ResourceGroupTests.ps1")
         {
-            
+            MockServerRecordingMode = HttpRecorderMode.Playback;
         }
 
         [TestInitialize]

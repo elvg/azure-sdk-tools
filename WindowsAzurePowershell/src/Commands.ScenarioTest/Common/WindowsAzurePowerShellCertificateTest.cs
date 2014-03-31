@@ -35,7 +35,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)
         {
-            HttpMockServer mockServer = new HttpMockServer(new SimpleRecordMatcher());
+            HttpMockServer mockServer = new HttpMockServer(new SimpleRecordMatcher(), this.GetType());
             e.AddHandlerToClient(mockServer);
             mockServers.Add(mockServer);
         }

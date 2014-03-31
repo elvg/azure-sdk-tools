@@ -24,9 +24,9 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 {
     public class HttpMockServer : DelegatingHandler
     {
-        private static string recordsDir = "SessionRecords";
-
         private static string namesPath = "assetNames.json";
+
+        private static string recordDir = "SessionRecords";
 
         private static string modeEnvironmentVariableName = "AZURE_TEST_MODE";
 
@@ -36,11 +36,30 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         private static int instanceCount;
 
-        private IRecordMatcher matcher;
-
         public static HttpRecorderMode Mode { get; set; }
 
+        public static bool CleanRecordsDirectory { get; set; }
+
+        public static string OutputDirectory { get; set; }
+
+        private IRecordMatcher matcher;
+
         public Records Records { get; private set; }
+
+        public string RecordsDirectory
+        {
+            get
+            {
+                string dirName = Path.Combine(recordDir, Identity);
+                if (Mode == HttpRecorderMode.Record)
+                {
+                    dirName = Path.Combine(OutputDirectory, dirName);
+                }
+                return dirName;
+            }
+        }
+
+        public string Identity { get; private set; }
 
         private static HttpRecorderMode GetCurrentMode()
         {
@@ -116,7 +135,13 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
             if (Mode == HttpRecorderMode.Record && instanceCount == 0)
             {
-                Utilities.RecreateDirectory(recordsDir);
+                Utilities.EnsureDirectoryExists(RecordsDirectory);
+
+                if (CleanRecordsDirectory)
+                {
+                    Utilities.CleanDirectory(RecordsDirectory);
+                }
+                
                 int count = 0;
                 const int packSize = 20;
                 List<RecordEntry> pack = new List<RecordEntry>();
@@ -129,7 +154,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                     {
                         Utilities.SerializeJson<List<RecordEntry>>(
                             pack,
-                            Path.Combine(recordsDir, string.Format("record{0}.json", count++)));
+                            Path.Combine(RecordsDirectory, string.Format("record{0}.json", count++)));
                         pack.Clear();
                     }
                 }
@@ -138,7 +163,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                 {
                     Utilities.SerializeJson<List<RecordEntry>>(
                         pack,
-                        Path.Combine(recordsDir, string.Format("record{0}.json", count++)));
+                        Path.Combine(RecordsDirectory, string.Format("record{0}.json", count++)));
                 }
 
                 Utilities.SerializeJson(names.Names, namesPath);
@@ -158,13 +183,22 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             names = new AssetNames();
             sessionRecords = new List<RecordEntry>();
             instanceCount = 0;
+            CleanRecordsDirectory = false;
             Mode = GetCurrentMode();
+        }
+
+        public HttpMockServer(IRecordMatcher matcher, Type callerIdentity)
+        {
+            instanceCount++;
+            this.matcher = matcher;
+            this.Identity = callerIdentity.Name;
+            this.Records = new Records(matcher);
 
             if (Mode == HttpRecorderMode.Playback)
             {
-                if (Directory.Exists(recordsDir))
+                if (Directory.Exists(RecordsDirectory))
                 {
-                    foreach (string recordsFile in Directory.GetFiles(recordsDir))
+                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory))
                     {
                         sessionRecords.AddRange(Utilities.DeserializeJson<List<RecordEntry>>(recordsFile));
                     }
@@ -173,17 +207,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                 Dictionary<string, string[]> savedNames = Utilities.DeserializeJson<Dictionary<string, string[]>>(namesPath)
                     ?? new Dictionary<string, string[]>();
                 savedNames.ForEach(r => names.Enqueue(r.Key, r.Value));
-            }
-        }
-
-        public HttpMockServer(IRecordMatcher matcher)
-        {
-            instanceCount++;
-            this.matcher = matcher;
-            this.Records = new Records(matcher);
-            
-            if (Mode == HttpRecorderMode.Playback)
-            {
                 Records.EnqueueRange(sessionRecords);
             }
         }
