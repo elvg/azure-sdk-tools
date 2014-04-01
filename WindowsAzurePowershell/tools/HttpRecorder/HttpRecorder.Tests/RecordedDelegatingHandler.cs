@@ -14,6 +14,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -78,11 +79,19 @@ namespace HttpRecorder.Tests
             {
                 if (_response != null)
                 {
-                    return _response;
+                    HttpResponseMessage response = new HttpResponseMessage(_response.StatusCode);
+                    response.RequestMessage = new HttpRequestMessage(request.Method, request.RequestUri);
+                    response.Content = _response.Content;
+                    foreach (var h in _response.Headers)
+                    {
+                        response.Headers.Add(h.Key, h.Value);
+                    }
+                    return response;
                 }
                 else
                 {
                     HttpResponseMessage response = new HttpResponseMessage(StatusCodeToReturn);
+                    response.RequestMessage = new HttpRequestMessage(request.Method, request.RequestUri); 
                     response.Content = new StringContent("");
                     return response;
                 }

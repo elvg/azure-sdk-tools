@@ -34,6 +34,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public static HttpRecorderMode Mode { get; set; }
         public static IRecordMatcher Matcher { get; set; }
+        public static string InputDirectory { get; set; }
         public static string OutputDirectory { get; set; }
         public static string CallerIdentity { get; set; }
         public static string TestIdentity { get; set; }
@@ -59,7 +60,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             {
                 if (Directory.Exists(RecordsDirectory))
                 {
-                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory, "record-*.json"))
+                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory, testIdentity + "*.json"))
                     {
                         RecordEntryPack pack = RecordEntryPack.Deserialize(recordsFile);
                         sessionRecords.AddRange(pack.Entries);
@@ -95,7 +96,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
         {
             get
             {
-                string dirName = Path.Combine(recordDir, CallerIdentity);
+                string dirName = InputDirectory ?? Path.Combine(recordDir, CallerIdentity);
                 return dirName;
             }
         }
@@ -105,7 +106,9 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             if (Mode == HttpRecorderMode.Playback)
             {
                 // Will throw KeyNotFoundException if the request is not recorded
-                return TaskEx.FromResult(records[Matcher.GetMatchingKey(request)].Dequeue().GetResponse());
+                var result = records[Matcher.GetMatchingKey(request)].Dequeue().GetResponse();
+                result.RequestMessage = request;
+                return TaskEx.FromResult(result);
             }
             else
             {

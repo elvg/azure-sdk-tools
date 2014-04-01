@@ -14,6 +14,7 @@
 
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Common;
@@ -26,10 +27,10 @@ namespace HttpRecorder.Tests
         {
         }
 
-        public async Task<HttpResponseMessage> DoStuff()
+        public async Task<HttpResponseMessage> DoStuffA()
         {
             // Construct URL
-            string url = "http://www.microsoft.com";
+            string url = "http://www.microsoft.com/path/to/resourceA";
 
             // Create HTTP transport objects
             HttpRequestMessage httpRequest = null;
@@ -40,6 +41,29 @@ namespace HttpRecorder.Tests
 
             // Set Headers
             httpRequest.Headers.Add("x-ms-version", "2013-11-01");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "abcdefg");
+
+            // Set Credentials
+            var cancellationToken = new CancellationToken();
+            cancellationToken.ThrowIfCancellationRequested();
+            return await HttpClient.SendAsync(httpRequest, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<HttpResponseMessage> DoStuffB()
+        {
+            // Construct URL
+            string url = "http://www.microsoft.com/path/to/resourceB";
+
+            // Create HTTP transport objects
+            HttpRequestMessage httpRequest = null;
+
+            httpRequest = new HttpRequestMessage();
+            httpRequest.Method = HttpMethod.Get;
+            httpRequest.RequestUri = new Uri(url);
+
+            // Set Headers
+            httpRequest.Headers.Add("x-ms-version", "2013-11-01");
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "xyz123");
 
             // Set Credentials
             var cancellationToken = new CancellationToken();

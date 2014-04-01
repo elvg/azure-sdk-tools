@@ -35,8 +35,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public HttpStatusCode StatusCode { get; set; }
 
-        public Dictionary<string, Queue<string>> Names { get; set; }
-
         public RecordEntry()
         {
             
