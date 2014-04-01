@@ -28,10 +28,11 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
         protected TestCredentialHelper credentials;
         protected string credentialFile;
         protected string profileFile;
+        private static string outputDirKey = "TEST_HTTPMOCK_OUTPUT";
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)
         {
-            e.AddHandlerToClient(HttpMockServer.Instance);
+            e.AddHandlerToClient(HttpMockServer.CreateInstance());
         }
 
         public WindowsAzurePowerShellCertificateTest(params string[] modules)
@@ -41,10 +42,9 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             this.credentialFile = TestCredentialHelper.DefaultCredentialFile;
             this.profileFile = TestCredentialHelper.WindowsAzureProfileFile;
 
-            HttpMockServer.Initialize(new SimpleRecordMatcher(), this.GetType());
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName());
+            HttpMockServer.OutputDirectory = Environment.GetEnvironmentVariable(outputDirKey);
             HttpMockServer.Mode = HttpRecorderMode.Record;
-            HttpMockServer.CleanRecordsDirectory = false;
-            HttpMockServer.Instance.Start();
         }
 
         [TestInitialize]
@@ -65,7 +65,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
         {
             base.TestCleanup();
             WindowsAzureSubscription.OnClientCreated -= OnClientCreated;
-            HttpMockServer.Instance.Dispose();
+            HttpMockServer.Flush();
         }
     }
 }

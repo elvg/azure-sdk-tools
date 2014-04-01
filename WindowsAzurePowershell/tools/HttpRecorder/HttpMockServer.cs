@@ -34,14 +34,12 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public static HttpRecorderMode Mode { get; set; }
         public static IRecordMatcher Matcher { get; set; }
-        public static bool CleanRecordsDirectory { get; set; }
         public static string OutputDirectory { get; set; }
         public static string CallerIdentity { get; set; }
         public static string TestIdentity { get; set; }
 
         static HttpMockServer()
         {
-            CleanRecordsDirectory = true;
             Matcher = new SimpleRecordMatcher();
             records = new Records(Matcher);
         }

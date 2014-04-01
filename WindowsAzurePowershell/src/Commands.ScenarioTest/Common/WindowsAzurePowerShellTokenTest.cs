@@ -33,17 +33,15 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)
         {
-            e.AddHandlerToClient(HttpMockServer.Instance);
+            e.AddHandlerToClient(HttpMockServer.CreateInstance());
         }
 
         public WindowsAzurePowerShellTokenTest(params string[] modules)
             : base(modules)
         {
-            HttpMockServer.Initialize(new SimpleRecordMatcher(), this.GetType());
-            HttpMockServer.Mode = HttpRecorderMode.Record;
-            HttpMockServer.CleanRecordsDirectory = false;
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName());
             HttpMockServer.OutputDirectory = Environment.GetEnvironmentVariable(outputDirKey);
-            HttpMockServer.Instance.Start();
+            HttpMockServer.Mode = HttpRecorderMode.Record;
         }
 
         [TestInitialize]
@@ -110,7 +108,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             base.TestCleanup();
             WindowsAzureSubscription.OnClientCreated -= OnClientCreated;
             WindowsAzureProfile.Instance.RemoveEnvironment(testEnvironmentName);
-            HttpMockServer.Instance.Dispose();
+            HttpMockServer.Flush();
         }
     }
 }
