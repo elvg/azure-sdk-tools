@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Xml.Linq;
@@ -138,6 +139,33 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             {
                 Directory.CreateDirectory(dir);
             }
+        }
+
+        public static string GetUniqueFileName(string filePath)
+        {
+            string fileDirectory = Path.GetDirectoryName(filePath);
+            string fileExtension = Path.GetExtension(filePath);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            int counter = 0;
+
+            while (true)
+            {
+                if (!File.Exists(filePath))
+                {
+                    return filePath;
+                }
+                filePath = Path.Combine(fileDirectory, fileName + counter + fileExtension);
+                counter++;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static string GetCurrentMethodName()
+        {
+            StackTrace st = new StackTrace();
+            StackFrame sf = st.GetFrame(1);
+
+            return sf.GetMethod().Name;
         }
     }
 }

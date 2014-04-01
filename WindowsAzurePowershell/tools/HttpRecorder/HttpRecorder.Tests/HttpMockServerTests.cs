@@ -1,0 +1,114 @@
+﻿// ----------------------------------------------------------------------------------
+//
+// Copyright Microsoft Corporation
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.IO;
+using System.Reflection;
+using Microsoft.WindowsAzure.Utilities.HttpRecorder;
+using Xunit;
+
+namespace HttpRecorder.Tests
+{
+    public class HttpMockServerTests : IDisposable
+    {
+        private string currentDir;
+        public HttpMockServerTests()
+        {
+            currentDir = Environment.CurrentDirectory;
+        }
+
+        [Fact]
+        public void TestRecordingWithOneClientWritesFile()
+        {
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName(), HttpRecorderMode.Record);
+            FakeHttpClient client = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            var result = client.DoStuff().Result;
+
+            HttpMockServer.Flush(currentDir);
+
+            Assert.True(File.Exists(Utilities.GetCurrentMethodName() + ".json"));
+        }
+
+        [Fact]
+        public void TestRecordingWithTwoClientsWritesFile()
+        {
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName(), HttpRecorderMode.Record);
+            FakeHttpClient client1 = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            FakeHttpClient client2 = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            var result1 = client1.DoStuff().Result;
+            var result2 = client2.DoStuff().Result;
+
+            HttpMockServer.Flush(currentDir);
+
+            Assert.True(File.Exists(Utilities.GetCurrentMethodName() + ".json"));
+        }
+
+        [Fact]
+        public void TestRecordingWithTwoMethodsWritesFile()
+        {
+            HttpMockServer.Initialize(this.GetType(), "testA", HttpRecorderMode.Record);
+            FakeHttpClient client1 = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            FakeHttpClient client2 = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            var result1 = client1.DoStuff().Result;
+            var result2 = client2.DoStuff().Result;
+            HttpMockServer.Flush(currentDir);
+
+            HttpMockServer.Initialize(this.GetType(), "testB", HttpRecorderMode.Record);
+            FakeHttpClient client3 = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            var result3 = client3.DoStuff().Result;
+            HttpMockServer.Flush(currentDir);
+
+            Assert.True(File.Exists("testA.json"));
+            Assert.True(File.Exists("testB.json"));
+        }
+
+        [Fact]
+        public void TestRecordingWithTwoMethodsWritesAllData()
+        {
+            HttpMockServer.Initialize(this.GetType(), "testA", HttpRecorderMode.Record);
+            FakeHttpClient client1 = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            FakeHttpClient client2 = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            var result1 = client1.DoStuff().Result;
+            var result2 = client2.DoStuff().Result;
+            var name = HttpMockServer.GetAssetName("testA", "tst");
+            HttpMockServer.Flush(currentDir);
+            RecordEntryPack pack = RecordEntryPack.Deserialize("testA.json");
+
+            Assert.NotNull(name);
+            Assert.True(File.Exists("testA.json"));
+            Assert.Equal(2, pack.Entries.Count);
+            Assert.Equal(1, pack.Names["testA"].Count);
+        }
+
+        [Fact]
+        public void NoneModeCreatesNoFiles()
+        {
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName(), HttpRecorderMode.None);
+            FakeHttpClient client = new FakeHttpClient().WithHandler(HttpMockServer.CreateInstance());
+            var result = client.DoStuff().Result;
+
+            HttpMockServer.Flush(currentDir);
+
+            Assert.False(File.Exists(Utilities.GetCurrentMethodName() + ".json"));
+        }
+
+        public void Dispose()
+        {
+            foreach (var file in Directory.GetFiles(currentDir, "*.json", SearchOption.AllDirectories))
+            {
+                File.Delete(file);
+            }
+        }
+    }
+}

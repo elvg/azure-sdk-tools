@@ -28,34 +28,35 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
         private const string modeEnvironmentVariableName = "AZURE_TEST_MODE";
         private static AssetNames names;
         private static List<RecordEntry> sessionRecords;
+        private static List<HttpMockServer> servers;
+        private static Records records;
+        private static bool initialized;
+
+        public static HttpRecorderMode Mode { get; set; }
+        public static IRecordMatcher Matcher { get; set; }
+        public static bool CleanRecordsDirectory { get; set; }
+        public static string OutputDirectory { get; set; }
+        public static string CallerIdentity { get; set; }
+        public static string TestIdentity { get; set; }
 
         static HttpMockServer()
         {
             CleanRecordsDirectory = true;
-            Mode = GetCurrentMode();
+            Matcher = new SimpleRecordMatcher();
+            records = new Records(Matcher);
         }
 
         private HttpMockServer() { }
 
-        public static void Initialize(IRecordMatcher matcher, Type callerIdentity)
+        public static void Initialize(Type callerIdentity, string testIdentity, HttpRecorderMode mode)
         {
-            HttpMockServer server = new HttpMockServer();
-            Matcher = matcher;
-            Identity = callerIdentity.Name;
-
-            server.InitializeState();
-            instance = server;
-        }
-
-        private void InitializeState()
-        {
+            CallerIdentity = callerIdentity.Name;
+            TestIdentity = testIdentity;
+            Mode = mode;
             names = new AssetNames();
             sessionRecords = new List<RecordEntry>();
-            Records = new Records(Matcher);
-        }
+            servers = new List<HttpMockServer>();
 
-        public void Start()
-        {
             if (Mode == HttpRecorderMode.Playback)
             {
                 if (Directory.Exists(RecordsDirectory))
@@ -70,52 +71,118 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                         }
                     }
                 }
-                Records.EnqueueRange(sessionRecords);
+                records.EnqueueRange(sessionRecords);
             }
+
+            initialized = true;
         }
-        
-        private static HttpMockServer instance = null;
-        public static HttpMockServer Instance
+
+        public static void Initialize(Type callerIdentity, string testIdentity)
+        {
+            Initialize(callerIdentity, testIdentity, GetCurrentMode());
+        }
+
+        public static HttpMockServer CreateInstance()
+        {
+            if (!initialized)
+            {
+                throw new ApplicationException("HttpMockServer has not been initialized yet. Use HttpMockServer.Initialize() method to initialize the HttpMockServer.");
+            }
+            HttpMockServer server = new HttpMockServer();
+            servers.Add(server);
+            return server;
+        }
+
+        public static string RecordsDirectory
         {
             get
             {
-                if (instance == null)
-                {
-                    instance = new HttpMockServer();
-                    instance.InitializeState();
-                    instance.Start();
-                }
-                return instance;
-            }
-        }
-
-        public static HttpRecorderMode Mode { get; set; }
-        public static IRecordMatcher Matcher { get; set; }
-        public static bool CleanRecordsDirectory { get; set; }
-        public static string OutputDirectory { get; set; }
-        public static string Identity { get; set; }
-
-        public string RecordsDirectory
-        {
-            get
-            {
-                string dirName = Path.Combine(recordDir, Identity);
-                if (Mode == HttpRecorderMode.Record)
-                {
-                    if (OutputDirectory != null)
-                    {
-                        dirName = Path.Combine(OutputDirectory, dirName);
-                    }
-                }
+                string dirName = Path.Combine(recordDir, CallerIdentity);
                 return dirName;
             }
         }
 
-        public Records Records { get; private set; }
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if (Mode == HttpRecorderMode.Playback)
+            {
+                // Will throw KeyNotFoundException if the request is not recorded
+                return TaskEx.FromResult(records[Matcher.GetMatchingKey(request)].Dequeue().GetResponse());
+            }
+            else
+            {
+                return base.SendAsync(request, cancellationToken).ContinueWith<HttpResponseMessage>(response =>
+                {
+                    HttpResponseMessage result = response.Result;
+                    if (Mode == HttpRecorderMode.Record)
+                    {
+                        RecordEntry recordEntry = new RecordEntry(result);
+                        records.Enqueue(new RecordEntry(result));
+                        sessionRecords.Add(recordEntry);
+                    }
+
+                    return result;
+                });
+            }
+        }
+
+        public static string GetAssetName(string testName, string prefix)
+        {
+            if (Mode == HttpRecorderMode.Playback)
+            {
+                return names[testName].Dequeue();
+            }
+            else
+            {
+                string generated = prefix + new Random().Next(9999);
+
+                if (names.ContainsKey(testName))
+                {
+                    while (names[testName].Any(n => n.Equals(generated)))
+                    {
+                        generated = prefix + new Random().Next(9999);
+                    }
+                }
+                names.Enqueue(testName, generated);
+
+                return generated;
+            }
+        }
+
+        public void InjectRecordEntry(RecordEntry record)
+        {
+            if (Mode == HttpRecorderMode.Playback)
+            {
+                records.Enqueue(record);
+            }
+        }
+
+        public static void Flush(string outputPath = null)
+        {
+            if (Mode == HttpRecorderMode.Record)
+            {
+                RecordEntryPack pack = new RecordEntryPack();
+
+                foreach (RecordEntry recordEntry in sessionRecords)
+                {
+                    pack.Entries.Add(recordEntry);
+                }
+
+                string fileDirectory = outputPath ?? RecordsDirectory;
+                string fileName = (TestIdentity ?? "record") + ".json";
+
+                Utilities.EnsureDirectoryExists(fileDirectory);
+                
+                pack.Names = names.Names;
+                pack.Serialize(Utilities.GetUniqueFileName(Path.Combine(fileDirectory, fileName)));
+            }
+
+            servers.ForEach(s => s.Dispose());
+        }
 
         private static HttpRecorderMode GetCurrentMode()
         {
-            string input =  Environment.GetEnvironmentVariable(modeEnvironmentVariableName);
+            string input = Environment.GetEnvironmentVariable(modeEnvironmentVariableName);
             HttpRecorderMode mode;
 
             if (string.IsNullOrEmpty(input))
@@ -130,96 +197,5 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             return mode;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            if (Mode == HttpRecorderMode.Playback)
-            {
-                // Will throw KeyNotFoundException if the request is not recorded
-                return TaskEx.FromResult(Records[Matcher.GetMatchingKey(request)].Dequeue().GetResponse());
-            }
-            else
-            {
-                return base.SendAsync(request, cancellationToken).ContinueWith<HttpResponseMessage>(response =>
-                {
-                    HttpResponseMessage result = response.Result;
-                    if (Mode == HttpRecorderMode.Record)
-                    {
-                        RecordEntry recordEntry = new RecordEntry(result);
-                        Records.Enqueue(new RecordEntry(result));
-                        sessionRecords.Add(recordEntry);
-                    }
-
-                    return result;
-                });
-            }
-        }
-
-        public static string GetAssetName(string testName, string prefix)
-        {
-            var server = Instance;
-
-            if (server == null)
-            {
-                throw new ApplicationException("HttpMockServer has not been started.");
-            }
-
-            if (Mode == HttpRecorderMode.Playback)
-            {
-                return server.names[testName].Dequeue();
-            }
-            else
-            {
-                string generated = prefix + new Random().Next(9999);
-
-                if (server.names.ContainsKey(testName))
-                {
-                    while (server.names[testName].Any(n => n.Equals(generated)))
-                    {
-                        generated = prefix + new Random().Next(9999);
-                    }
-                }
-                server.names.Enqueue(testName, generated);
-
-                return generated;
-            }
-        }
-
-        public void InjectRecordEntry(RecordEntry record)
-        {
-            if (Mode == HttpRecorderMode.Playback)
-            {
-                Records.Enqueue(record);
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (Mode == HttpRecorderMode.Record)
-            {
-                Utilities.EnsureDirectoryExists(RecordsDirectory);
-
-                if (CleanRecordsDirectory)
-                {
-                    Utilities.CleanDirectory(RecordsDirectory);
-                }
-
-                RecordEntryPack pack = new RecordEntryPack();
-
-                foreach (RecordEntry recordEntry in sessionRecords)
-                {
-                    pack.Entries.Add(recordEntry);
-                }
-
-                pack.Names = names.Names;
-
-                pack.Serialize(Path.Combine(RecordsDirectory, string.Format("record-{0:yyyyMMddHHmmss}.json", DateTime.Now)));
-            }
-
-            instance = null;
-        }
     }
 }
