@@ -42,8 +42,8 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             this.profileFile = TestCredentialHelper.WindowsAzureProfileFile;
 
             HttpMockServer.Initialize(new SimpleRecordMatcher(), this.GetType());
-            HttpMockServer.Instance.Mode = HttpRecorderMode.Record;
-            HttpMockServer.Instance.CleanRecordsDirectory = false;
+            HttpMockServer.Mode = HttpRecorderMode.Record;
+            HttpMockServer.CleanRecordsDirectory = false;
             HttpMockServer.Instance.Start();
         }
 

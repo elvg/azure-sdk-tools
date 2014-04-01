@@ -26,23 +26,74 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
     {
         private const string recordDir = "SessionRecords";
         private const string modeEnvironmentVariableName = "AZURE_TEST_MODE";
-        private AssetNames names;
-        private List<RecordEntry> sessionRecords;
-        private IRecordMatcher matcher;
+        private static AssetNames names;
+        private static List<RecordEntry> sessionRecords;
 
+        static HttpMockServer()
+        {
+            CleanRecordsDirectory = true;
+            Mode = GetCurrentMode();
+        }
+
+        private HttpMockServer() { }
+
+        public static void Initialize(IRecordMatcher matcher, Type callerIdentity)
+        {
+            HttpMockServer server = new HttpMockServer();
+            Matcher = matcher;
+            Identity = callerIdentity.Name;
+
+            server.InitializeState();
+            instance = server;
+        }
+
+        private void InitializeState()
+        {
+            names = new AssetNames();
+            sessionRecords = new List<RecordEntry>();
+            Records = new Records(Matcher);
+        }
+
+        public void Start()
+        {
+            if (Mode == HttpRecorderMode.Playback)
+            {
+                if (Directory.Exists(RecordsDirectory))
+                {
+                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory, "record-*.json"))
+                    {
+                        RecordEntryPack pack = RecordEntryPack.Deserialize(recordsFile);
+                        sessionRecords.AddRange(pack.Entries);
+                        foreach (var func in pack.Names.Keys)
+                        {
+                            pack.Names[func].ForEach(n => names.Enqueue(func, n));
+                        }
+                    }
+                }
+                Records.EnqueueRange(sessionRecords);
+            }
+        }
+        
         private static HttpMockServer instance = null;
         public static HttpMockServer Instance
         {
-            get { return instance; }
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new HttpMockServer();
+                    instance.InitializeState();
+                    instance.Start();
+                }
+                return instance;
+            }
         }
-        
-        public HttpRecorderMode Mode { get; set; }
 
-        public bool CleanRecordsDirectory { get; set; }
-
-        public string OutputDirectory { get; set; }
-
-        public string Identity { get; set; }
+        public static HttpRecorderMode Mode { get; set; }
+        public static IRecordMatcher Matcher { get; set; }
+        public static bool CleanRecordsDirectory { get; set; }
+        public static string OutputDirectory { get; set; }
+        public static string Identity { get; set; }
 
         public string RecordsDirectory
         {
@@ -86,7 +137,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             if (Mode == HttpRecorderMode.Playback)
             {
                 // Will throw KeyNotFoundException if the request is not recorded
-                return TaskEx.FromResult(Records[matcher.GetMatchingKey(request)].Dequeue().GetResponse());
+                return TaskEx.FromResult(Records[Matcher.GetMatchingKey(request)].Dequeue().GetResponse());
             }
             else
             {
@@ -114,7 +165,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                 throw new ApplicationException("HttpMockServer has not been started.");
             }
 
-            if (server.Mode == HttpRecorderMode.Playback)
+            if (Mode == HttpRecorderMode.Playback)
             {
                 return server.names[testName].Dequeue();
             }
@@ -132,6 +183,14 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                 server.names.Enqueue(testName, generated);
 
                 return generated;
+            }
+        }
+
+        public void InjectRecordEntry(RecordEntry record)
+        {
+            if (Mode == HttpRecorderMode.Playback)
+            {
+                Records.Enqueue(record);
             }
         }
 
@@ -159,51 +218,8 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
                 pack.Serialize(Path.Combine(RecordsDirectory, string.Format("record-{0:yyyyMMddHHmmss}.json", DateTime.Now)));
             }
-        }
 
-        public void InjectRecordEntry(RecordEntry record)
-        {
-            if (Mode == HttpRecorderMode.Playback)
-            {
-                Records.Enqueue(record);
-            }
-        }
-
-        private HttpMockServer() {}
-
-        public static void Initialize(IRecordMatcher matcher, Type callerIdentity)
-        {
-            HttpMockServer server = new HttpMockServer();
-            server.names = new AssetNames();
-            server.sessionRecords = new List<RecordEntry>();
-            server.CleanRecordsDirectory = true;
-            server.Mode = GetCurrentMode();
-
-            server.matcher = matcher;
-            server.Identity = callerIdentity.Name;
-            server.Records = new Records(matcher);
-
-            instance = server;
-        }
-
-        public void Start()
-        {
-            if (Mode == HttpRecorderMode.Playback)
-            {
-                if (Directory.Exists(RecordsDirectory))
-                {
-                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory, "record-*.json"))
-                    {
-                        RecordEntryPack pack = RecordEntryPack.Deserialize(recordsFile);
-                        sessionRecords.AddRange(pack.Entries);
-                        foreach (var func in pack.Names.Keys)
-                        {
-                            pack.Names[func].ForEach(n => names.Enqueue(func, n));
-                        }
-                    }
-                }
-                Records.EnqueueRange(sessionRecords);
-            }
+            instance = null;
         }
     }
 }

@@ -40,9 +40,9 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             : base(modules)
         {
             HttpMockServer.Initialize(new SimpleRecordMatcher(), this.GetType());
-            HttpMockServer.Instance.Mode = HttpRecorderMode.Record;
-            HttpMockServer.Instance.CleanRecordsDirectory = false;
-            HttpMockServer.Instance.OutputDirectory = Environment.GetEnvironmentVariable(outputDirKey);
+            HttpMockServer.Mode = HttpRecorderMode.Record;
+            HttpMockServer.CleanRecordsDirectory = false;
+            HttpMockServer.OutputDirectory = Environment.GetEnvironmentVariable(outputDirKey);
             HttpMockServer.Instance.Start();
         }
 
