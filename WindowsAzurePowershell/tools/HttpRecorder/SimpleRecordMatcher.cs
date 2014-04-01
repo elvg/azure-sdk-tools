@@ -43,6 +43,14 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         private string GetMatchingKey(string httpMethod, string requestUri)
         {
+            try
+            {
+                requestUri = new Uri(requestUri).PathAndQuery;
+            }
+            catch
+            {
+                // Ignore
+            }
             StringBuilder key = new StringBuilder(string.Format("{0} {1}", httpMethod, requestUri));
 
             foreach (KeyValuePair<string, List<string>> item in MatchingHeaders)

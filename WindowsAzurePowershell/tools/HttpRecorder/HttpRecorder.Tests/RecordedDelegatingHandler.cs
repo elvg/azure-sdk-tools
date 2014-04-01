@@ -81,6 +81,10 @@ namespace HttpRecorder.Tests
                 {
                     HttpResponseMessage response = new HttpResponseMessage(_response.StatusCode);
                     response.RequestMessage = new HttpRequestMessage(request.Method, request.RequestUri);
+                    foreach (var header in request.Headers)
+                    {
+                        response.RequestMessage.Headers.Add(header.Key, header.Value);
+                    }
                     response.Content = _response.Content;
                     foreach (var h in _response.Headers)
                     {

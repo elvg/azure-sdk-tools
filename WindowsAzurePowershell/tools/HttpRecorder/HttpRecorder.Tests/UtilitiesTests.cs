@@ -38,5 +38,16 @@ namespace HttpRecorder.Tests
         {
             Assert.Equal("GetCurrentMethodNameReturnsName", Utilities.GetCurrentMethodName());
         }
+
+        [Fact]
+        public void GetCurrentMethodNameReturnsNameWithIndex()
+        {
+            Assert.Equal("GetCurrentMethodNameReturnsNameWithIndex", GetName());
+        }
+
+        private string GetName()
+        {
+            return Utilities.GetCurrentMethodName(2);
+        }
     }
 }

@@ -24,7 +24,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 {
     public class HttpMockServer : DelegatingHandler
     {
-        private const string recordDir = "SessionRecords";
         private const string modeEnvironmentVariableName = "AZURE_TEST_MODE";
         private static AssetNames names;
         private static List<RecordEntry> sessionRecords;
@@ -34,8 +33,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public static HttpRecorderMode Mode { get; set; }
         public static IRecordMatcher Matcher { get; set; }
-        public static string InputDirectory { get; set; }
-        public static string OutputDirectory { get; set; }
         public static string CallerIdentity { get; set; }
         public static string TestIdentity { get; set; }
 
@@ -43,6 +40,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
         {
             Matcher = new SimpleRecordMatcher();
             records = new Records(Matcher);
+            RecordsDirectory = "SessionRecords";
         }
 
         private HttpMockServer() { }
@@ -58,9 +56,10 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
             if (Mode == HttpRecorderMode.Playback)
             {
-                if (Directory.Exists(RecordsDirectory))
+                string recordDir = Path.Combine(RecordsDirectory, CallerIdentity);
+                if (Directory.Exists(recordDir))
                 {
-                    foreach (string recordsFile in Directory.GetFiles(RecordsDirectory, testIdentity + "*.json"))
+                    foreach (string recordsFile in Directory.GetFiles(recordDir, testIdentity + "*.json"))
                     {
                         RecordEntryPack pack = RecordEntryPack.Deserialize(recordsFile);
                         sessionRecords.AddRange(pack.Entries);
@@ -92,14 +91,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             return server;
         }
 
-        public static string RecordsDirectory
-        {
-            get
-            {
-                string dirName = InputDirectory ?? Path.Combine(recordDir, CallerIdentity);
-                return dirName;
-            }
-        }
+        public static string RecordsDirectory { get; set; }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -166,11 +158,15 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
                 foreach (RecordEntry recordEntry in sessionRecords)
                 {
+                    recordEntry.RequestHeaders.Remove("Authorization");
+                    recordEntry.RequestUri = new Uri(recordEntry.RequestUri).PathAndQuery;
                     pack.Entries.Add(recordEntry);
                 }
 
                 string fileDirectory = outputPath ?? RecordsDirectory;
                 string fileName = (TestIdentity ?? "record") + ".json";
+
+                fileDirectory = Path.Combine(fileDirectory, CallerIdentity);
 
                 Utilities.EnsureDirectoryExists(fileDirectory);
                 

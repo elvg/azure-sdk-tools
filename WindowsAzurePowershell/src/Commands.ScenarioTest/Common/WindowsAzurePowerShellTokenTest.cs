@@ -13,23 +13,24 @@
 // ----------------------------------------------------------------------------------
 
 
-using System;
-
 namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
 {
-    using System.Collections.Generic;
-    using VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Management.Automation;
     using Commands.Common;
-    using WindowsAzure.Utilities.HttpRecorder;
-    using Utilities.Common;
     using Commands.Common.Test.Common;
     using Test.Utilities.Common;
+    using Utilities.Common;
+    using VisualStudio.TestTools.UnitTesting;
+    using WindowsAzure.Utilities.HttpRecorder;
 
     [TestClass]
     public class WindowsAzurePowerShellTokenTest : PowerShellTest
     {
         private static string testEnvironmentName = "__test-environment";
         private static string outputDirKey = "TEST_HTTPMOCK_OUTPUT";
+        private HttpRecorderMode recordingMode = HttpRecorderMode.Playback;
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)
         {
@@ -39,9 +40,13 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
         public WindowsAzurePowerShellTokenTest(params string[] modules)
             : base(modules)
         {
-            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName());
-            HttpMockServer.OutputDirectory = Environment.GetEnvironmentVariable(outputDirKey);
-            HttpMockServer.Mode = HttpRecorderMode.Record;
+            HttpMockServer.RecordsDirectory = Environment.GetEnvironmentVariable(outputDirKey);
+        }
+
+        public override Collection<PSObject> RunPowerShellTest(params string[] scripts)
+        {
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName(2), recordingMode);
+            return base.RunPowerShellTest(scripts);
         }
 
         [TestInitialize]

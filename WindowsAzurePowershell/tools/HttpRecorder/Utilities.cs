@@ -160,10 +160,10 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static string GetCurrentMethodName()
+        public static string GetCurrentMethodName(int index = 1)
         {
             StackTrace st = new StackTrace();
-            StackFrame sf = st.GetFrame(1);
+            StackFrame sf = st.GetFrame(index);
 
             return sf.GetMethod().Name;
         }

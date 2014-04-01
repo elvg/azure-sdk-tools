@@ -43,7 +43,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             this.profileFile = TestCredentialHelper.WindowsAzureProfileFile;
 
             HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName());
-            HttpMockServer.OutputDirectory = Environment.GetEnvironmentVariable(outputDirKey);
+            HttpMockServer.RecordsDirectory = Environment.GetEnvironmentVariable(outputDirKey);
             HttpMockServer.Mode = HttpRecorderMode.Record;
         }
 
