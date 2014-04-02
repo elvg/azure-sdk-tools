@@ -16,6 +16,7 @@
 namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
 {
     using System;
+    using System.Linq;
     using System.Collections.ObjectModel;
     using System.Management.Automation;
     using Commands.Common;
@@ -90,7 +91,18 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             WindowsAzureProfile.Instance.CurrentEnvironment.ServiceEndpoint =
                 rdfeEnvironment.BaseUri.AbsoluteUri;
 
-            RunPowerShellTest("Add-AzureAccount -Environment " + testEnvironmentName);
+            if (recordingMode == HttpRecorderMode.Playback)
+            {
+                WindowsAzureProfile.Instance.AddSubscription(new WindowsAzureSubscription
+                    {
+                        SubscriptionId = csmEnvironment.SubscriptionId
+                    });
+                WindowsAzureProfile.Instance.Save();
+            }
+            else
+            {
+                RunPowerShellTest("Add-AzureAccount -Environment " + testEnvironmentName);
+            }
 
             foreach (var subscription in WindowsAzureProfile.Instance.Subscriptions)
             {
@@ -105,6 +117,9 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
                     subscription.IsDefault = false;
                 }
             }
+
+            WindowsAzureProfile.Instance.UpdateSubscription(WindowsAzureProfile.Instance.Subscriptions.First(s=>s.IsDefault));
+            WindowsAzureProfile.Instance.Save();
         }
 
         [TestCleanup]

@@ -363,7 +363,7 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
             }
         }
 
-        private void Save()
+        public void Save()
         {
             var profileData = new ProfileData();
             SetEnvironmentData(profileData);
