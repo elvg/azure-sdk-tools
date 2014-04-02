@@ -26,9 +26,8 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
     {
         private const string modeEnvironmentVariableName = "AZURE_TEST_MODE";
         private static AssetNames names;
-        private static List<RecordEntry> sessionRecords;
-        private static List<HttpMockServer> servers;
         private static Records records;
+        private static List<HttpMockServer> servers;
         private static bool initialized;
 
         public static HttpRecorderMode Mode { get; set; }
@@ -51,7 +50,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             TestIdentity = testIdentity;
             Mode = mode;
             names = new AssetNames();
-            sessionRecords = new List<RecordEntry>();
             servers = new List<HttpMockServer>();
 
             if (Mode == HttpRecorderMode.Playback)
@@ -62,14 +60,16 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                     foreach (string recordsFile in Directory.GetFiles(recordDir, testIdentity + "*.json"))
                     {
                         RecordEntryPack pack = RecordEntryPack.Deserialize(recordsFile);
-                        sessionRecords.AddRange(pack.Entries);
+                        foreach (var entry in pack.Entries)
+                        {
+                            records.Enqueue(entry);
+                        }
                         foreach (var func in pack.Names.Keys)
                         {
                             pack.Names[func].ForEach(n => names.Enqueue(func, n));
                         }
                     }
                 }
-                records.EnqueueRange(sessionRecords);
             }
 
             initialized = true;
@@ -109,9 +109,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
                     HttpResponseMessage result = response.Result;
                     if (Mode == HttpRecorderMode.Record)
                     {
-                        RecordEntry recordEntry = new RecordEntry(result);
                         records.Enqueue(new RecordEntry(result));
-                        sessionRecords.Add(recordEntry);
                     }
 
                     return result;
@@ -156,7 +154,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             {
                 RecordEntryPack pack = new RecordEntryPack();
 
-                foreach (RecordEntry recordEntry in sessionRecords)
+                foreach (RecordEntry recordEntry in records.GetAllEntities())
                 {
                     recordEntry.RequestHeaders.Remove("Authorization");
                     recordEntry.RequestUri = new Uri(recordEntry.RequestUri).PathAndQuery;

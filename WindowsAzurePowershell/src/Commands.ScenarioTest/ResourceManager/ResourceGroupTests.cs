@@ -23,7 +23,6 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
     public class ResourceGroupTests : WindowsAzurePowerShellTokenTest
     {
         private string currentDirectory;
-        private HttpRecorderMode recordingMode = HttpRecorderMode.Record;
 
         public ResourceGroupTests()
             : base("ResourceManager\\Common.ps1",

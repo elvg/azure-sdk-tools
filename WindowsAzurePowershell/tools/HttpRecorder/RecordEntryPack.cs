@@ -19,7 +19,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 {
     public class RecordEntryPack
     {
-        private const int MaxEntriesCount = 20;
+        private const int MaxEntriesCount = 100;
         public List<RecordEntry> Entries { get; set; }
         public Dictionary<string, Queue<string>> Names { get; set; }
 

@@ -176,6 +176,37 @@ namespace HttpRecorder.Tests
             Assert.True(File.Exists(Path.Combine(Path.GetTempPath(), this.GetType().Name, Utilities.GetCurrentMethodName() + ".json")));
         }
 
+        [Fact]
+        public void TestPlaybackWithAssetInUrlClient()
+        {
+            HttpMockServer.RecordsDirectory = currentDir;
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName(), HttpRecorderMode.Record);
+            FakeHttpClient client1 = CreateClient();
+            string assetName1 = HttpMockServer.GetAssetName(Utilities.GetCurrentMethodName(), "tst");
+            string assetName2 = HttpMockServer.GetAssetName(Utilities.GetCurrentMethodName(), "tst");
+            var result1A = client1.DoStuffX(assetName1).Result;
+            var result1B = client1.DoStuffX(assetName2).Result;
+            HttpMockServer.Flush(currentDir);
+
+            HttpMockServer.Initialize(this.GetType(), Utilities.GetCurrentMethodName(), HttpRecorderMode.Playback);
+            FakeHttpClient client3 = CreateClientWithBadResult();
+            string assetName1Playback = HttpMockServer.GetAssetName(Utilities.GetCurrentMethodName(), "tst");
+            string assetName2Playback = HttpMockServer.GetAssetName(Utilities.GetCurrentMethodName(), "tst");
+            var result3A = client3.DoStuffX(assetName1Playback).Result;
+            var result3B = client3.DoStuffX(assetName2Playback).Result;
+            HttpMockServer.Flush(currentDir);
+
+            string result1AConent = JObject.Parse(result1A.Content.ReadAsStringAsync().Result).ToString();
+            string result3AConent = JObject.Parse(result3A.Content.ReadAsStringAsync().Result).ToString();
+
+            Assert.True(File.Exists(Path.Combine(HttpMockServer.CallerIdentity, Utilities.GetCurrentMethodName() + ".json")));
+            Assert.Equal(result1A.StatusCode, result3A.StatusCode);
+            Assert.Equal(result1A.RequestMessage.RequestUri.AbsoluteUri, result3A.RequestMessage.RequestUri.AbsoluteUri);
+            Assert.Equal(result1AConent, result3AConent);
+            Assert.Equal(assetName1, assetName1Playback);
+            Assert.Equal(assetName2, assetName2Playback);
+        }
+
         public void Dispose()
         {
             foreach (var file in Directory.GetFiles(currentDir, "*.json", SearchOption.AllDirectories))

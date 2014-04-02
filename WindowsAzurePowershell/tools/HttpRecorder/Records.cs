@@ -16,14 +16,14 @@ using Microsoft.WindowsAzure.Utilities.HttpRecorder;
 
 namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 {
-    using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Diagnostics.CodeAnalysis;
     using System.Collections;
 
     [SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
-    public class Records : IEnumerable<KeyValuePair<string, Queue<RecordEntry>>>
+    public class Records
     {
         private Dictionary<string, Queue<RecordEntry>> sessionRecords;
 
@@ -54,14 +54,15 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             set { sessionRecords[key] = value; }
         }
 
-        public IEnumerator<KeyValuePair<string, Queue<RecordEntry>>> GetEnumerator()
+        public IEnumerable<RecordEntry> GetAllEntities()
         {
-            return sessionRecords.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return sessionRecords.GetEnumerator();
+            foreach (var queues in sessionRecords.Values)
+            {
+                while (queues.Count > 0)
+                {
+                    yield return queues.Dequeue();
+                }
+            }
         }
 
         public void EnqueueRange(List<RecordEntry> records)
