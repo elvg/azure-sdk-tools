@@ -24,8 +24,8 @@ namespace Microsoft.WindowsAzure.Commands.Test.Utilities.Common
             authTokenSetter("Bearer", AccessToken);
         }
 
-        public string AccessToken { get; internal set; }
-        public string UserId { get; internal set; }
-        public LoginType LoginType { get; internal set; }
+        public string AccessToken { get; set; }
+        public string UserId { get; set; }
+        public LoginType LoginType { get; set; }
     }
 }

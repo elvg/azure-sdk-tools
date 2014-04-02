@@ -91,34 +91,34 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             WindowsAzureProfile.Instance.CurrentEnvironment.ServiceEndpoint =
                 rdfeEnvironment.BaseUri.AbsoluteUri;
 
+            var newSubscription = new WindowsAzureSubscription(false)
+            {
+                SubscriptionId = csmEnvironment.SubscriptionId,
+                ActiveDirectoryEndpoint =
+                    WindowsAzureProfile.Instance.CurrentEnvironment.ActiveDirectoryEndpoint,
+                ActiveDirectoryUserId = csmEnvironment.UserName,
+                SubscriptionName = csmEnvironment.SubscriptionId,
+                ServiceEndpoint = new Uri(WindowsAzureProfile.Instance.CurrentEnvironment.ServiceEndpoint),
+                ResourceManagerEndpoint =
+                    new Uri(WindowsAzureProfile.Instance.CurrentEnvironment.ResourceManagerEndpoint),
+                TokenProvider = WindowsAzureProfile.Instance.TokenProvider,
+                GalleryEndpoint = new Uri(WindowsAzureProfile.Instance.CurrentEnvironment.GalleryEndpoint),
+                IsDefault = true
+            };
             if (recordingMode == HttpRecorderMode.Playback)
             {
-                WindowsAzureProfile.Instance.AddSubscription(new WindowsAzureSubscription
+                newSubscription.SetAccessToken(new FakeAccessToken
                     {
-                        SubscriptionId = csmEnvironment.SubscriptionId
+                        AccessToken = "123",
+                        UserId = csmEnvironment.UserName
                     });
-                WindowsAzureProfile.Instance.Save();
             }
             else
             {
-                RunPowerShellTest("Add-AzureAccount -Environment " + testEnvironmentName);
+                newSubscription.SetAccessToken(WindowsAzureProfile.Instance.TokenProvider.GetNewToken(WindowsAzureProfile.Instance.CurrentEnvironment));
             }
 
-            foreach (var subscription in WindowsAzureProfile.Instance.Subscriptions)
-            {
-                subscription.TokenProvider = WindowsAzureProfile.Instance.TokenProvider;
-                if (subscription.SubscriptionId == csmEnvironment.SubscriptionId)
-                {
-                    subscription.IsDefault = true;
-                    subscription.CurrentStorageAccountName = csmEnvironment.StorageAccount;
-                }
-                else
-                {
-                    subscription.IsDefault = false;
-                }
-            }
-
-            WindowsAzureProfile.Instance.UpdateSubscription(WindowsAzureProfile.Instance.Subscriptions.First(s=>s.IsDefault));
+            WindowsAzureProfile.Instance.AddSubscription(newSubscription);
             WindowsAzureProfile.Instance.Save();
         }
 

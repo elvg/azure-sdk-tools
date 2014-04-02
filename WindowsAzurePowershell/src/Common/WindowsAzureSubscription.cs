@@ -33,6 +33,16 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
     /// </summary>
     public class WindowsAzureSubscription
     {
+        private bool registerProvidersOnCreateClient;
+
+        public WindowsAzureSubscription() : this(true)
+        { }
+
+        public WindowsAzureSubscription(bool registerProviders)
+        {
+            registerProvidersOnCreateClient = registerProviders;
+        }
+
         public string SubscriptionName { get; set; }
         
         public string SubscriptionId { get; set; }
@@ -167,7 +177,7 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
         /// <returns>The service client instance</returns>
         public TClient CreateClient<TClient>() where TClient : ServiceClient<TClient>
         {
-            return ClientClientFromEndpoint<TClient>(ServiceEndpoint);
+            return CreateClientFromEndpoint<TClient>(ServiceEndpoint);
         }
 
         /// <summary>
@@ -182,7 +192,7 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
             {
                 throw new ArgumentException(Resources.InvalidSubscriptionState);
             }
-            return ClientClientFromEndpoint<TClient>(GalleryEndpoint, false);
+            return CreateClientFromEndpoint<TClient>(GalleryEndpoint, false);
         }
 
         public TClient CreateClientFromResourceManagerEndpoint<TClient>() where TClient : ServiceClient<TClient>
@@ -191,15 +201,15 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
             {
                 throw new ArgumentException(Resources.InvalidSubscriptionState);
             }
-            return ClientClientFromEndpoint<TClient>(ResourceManagerEndpoint);
+            return CreateClientFromEndpoint<TClient>(ResourceManagerEndpoint);
         }
 
-        public TClient ClientClientFromEndpoint<TClient>(Uri endpoint) where TClient : ServiceClient<TClient>
+        public TClient CreateClientFromEndpoint<TClient>(Uri endpoint) where TClient : ServiceClient<TClient>
         {
-            return ClientClientFromEndpoint<TClient>(endpoint, true);
+            return CreateClientFromEndpoint<TClient>(endpoint, registerProvidersOnCreateClient);
         }
 
-        public TClient ClientClientFromEndpoint<TClient>(Uri endpoint, bool registerProviders) where TClient : ServiceClient<TClient>
+        public TClient CreateClientFromEndpoint<TClient>(Uri endpoint, bool registerProviders) where TClient : ServiceClient<TClient>
         {
             var credential = CreateCredentials();
 
@@ -269,24 +279,6 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
                     }
                 }
             }
-        }
-
-        private List<Provider> GetProviders(IResourceManagementClient client)
-        {
-            if (ResourceManagerProviders == null)
-            {
-                ResourceManagerProviders = new List<Provider>();
-                ProviderListResult result = client.Providers.List(null);
-                ResourceManagerProviders.AddRange(result.Providers);
-
-                while (!string.IsNullOrEmpty(result.NextLink))
-                {
-                    result = client.Providers.ListNext(result.NextLink);
-                    ResourceManagerProviders.AddRange(result.Providers);
-                }
-            }
-
-            return ResourceManagerProviders;
         }
 
         /// <summary>
