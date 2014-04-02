@@ -30,7 +30,7 @@ namespace Microsoft.WindowsAzure.Management.HDInsight.Cmdlet.PSCmdlets
         public const string AliasJobName = "Name";
         public const string AliasLoc = "Loc";
         public const string AliasNodes = "Nodes";
-        public const string EnableHeadNodeHighAvailibility = "EnableHeadNodeHighAvailibility";
+        public const string EnableHeadNodeHighAvailability = "EnableHeadNodeHighAvailability";
         public const string AliasOutput = "Output";
         public const string AliasOutputFormat = "OutputFormat";
         public const string AliasParameters = "Params";

@@ -239,7 +239,7 @@ namespace Microsoft.WindowsAzure.Management.HDInsight.Cmdlet.PSCmdlets
         /// <inheritdoc />
         [Parameter(Position = 13, Mandatory = false, HelpMessage = "Enables High availability for the Head Node in your Hadoop cluster.",
             ParameterSetName = AzureHdInsightPowerShellConstants.ParameterSetClusterByNameWithSpecificSubscriptionCredentials)]
-        [Alias(AzureHdInsightPowerShellConstants.EnableHeadNodeHighAvailibility)]
+        [Alias(AzureHdInsightPowerShellConstants.EnableHeadNodeHighAvailability)]
         public SwitchParameter EnableHeadNodeHigAvailability { get; set; }
 
         /// <inheritdoc />

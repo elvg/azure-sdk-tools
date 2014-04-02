@@ -90,7 +90,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.HDInsight.CmdLetTests
         public const string JobId = "JobId";
         public const string FromDateTime = "From";
         public const string Location = "Location";
-        public const string EnableHeadNodeHighAvailibility = "EnableHeadNodeHighAvailibility";
+        public const string EnableHeadNodeHighAvailability = "EnableHeadNodeHighAvailability";
         public const string EastUs = "East US";
         public const string DefaultStorageAccountName = "DefaultStorageAccountName";
         public const string DefaultStorageAccountKey = "DefaultStorageAccountKey";

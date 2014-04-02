@@ -456,7 +456,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.HDInsight.CmdLetTests
                                       CmdletConstants.DefaultStorageContainerName,
                                       TestCredentials.Environments[0].DefaultStorageAccount.Container)
                                       .WithParameter(CmdletConstants.Credential, GetPSCredential("hadoop", this.GetRandomValidPassword()))
-                                      .WithParameter(CmdletConstants.EnableHeadNodeHighAvailibility, null)
+                                      .WithParameter(CmdletConstants.EnableHeadNodeHighAvailability, null)
                                       .WithParameter(CmdletConstants.ClusterSizeInNodes, 5)
                                                       .Invoke();
 
