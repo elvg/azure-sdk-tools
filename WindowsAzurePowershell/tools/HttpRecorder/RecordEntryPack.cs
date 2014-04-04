@@ -19,7 +19,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 {
     public class RecordEntryPack
     {
-        private const int MaxEntriesCount = 100;
         public List<RecordEntry> Entries { get; set; }
         public Dictionary<string, Queue<string>> Names { get; set; }
 
@@ -35,11 +34,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public void Serialize(string path)
         {
-            if (Entries.Count > MaxEntriesCount)
-            {
-                Entries.RemoveRange(0, Entries.Count - MaxEntriesCount);
-            }
-
             Utilities.SerializeJson(this, path);
         }
     }

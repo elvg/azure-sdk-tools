@@ -245,51 +245,6 @@
     <Resource Include="Resources\ResourceManager\DeploymentTests.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <None Include="Resources\SessionRecords\DeploymentTests\TestNewDeploymentFromTemplateFile.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\DeploymentTests\TestValidateDeployment.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceGroupTests\TestCreatesAndRemoveResourceGroupViaPiping.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceGroupTests\TestCreatesNewSimpleResourceGroup.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceGroupTests\TestGetNonExistingResourceGroup.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceGroupTests\TestNewResourceGroupInNonExistingLocation.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceGroupTests\TestRemoveNonExistingResourceGroup.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestCreatesNewComplexResource.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestCreatesNewSimpleResource.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestGetResourceForNonExisingResource.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestGetResourcesForNonExisingType.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestGetResourcesFromEmptyGroup.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestGetResourcesFromNonExisingGroup.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestGetResourcesViaPiping.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SessionRecords\ResourceTests\TestGetResourcesViaPipingFromAnotherResource.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\Websites\WebsiteJobTestCmd.zip" />
     <Resource Include="Resources\Common.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -370,6 +325,10 @@
       <Project>{9e5cb6e6-92af-464a-bd30-e848d94ed490}</Project>
       <Name>HttpRecorder</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Commands.ResourceManager\Commands.ResourceManager.csproj">
+      <Project>{e1f5201d-6067-430e-b303-4e367652991b}</Project>
+      <Name>Commands.ResourceManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commands.Test.Utilities\Commands.Test.Utilities.csproj">
       <Project>{bc420543-c04e-4bf3-96e1-cd81b823bdd7}</Project>
       <Name>Commands.Test.Utilities</Name>
@@ -417,7 +376,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Resources\SessionRecords\DeploymentTests\" />
+    <Folder Include="Resources\SessionRecords\ResourceGroupTests\" />
+    <Folder Include="Resources\SessionRecords\ResourceTests\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" />

@@ -43,3 +43,14 @@ function Get-ProviderLocation($provider)
 		$location.Locations[0]
 	}
 }
+
+<#
+.SYNOPSIS
+Gets valid resource name
+#>
+function Clean-ResourceGroup($rgname)
+{
+	if ([Microsoft.WindowsAzure.Utilities.HttpRecorder.HttpMockServer]::Mode -ne [Microsoft.WindowsAzure.Utilities.HttpRecorder.HttpRecorderMode]::Playback) {
+		Remove-AzureResourceGroup -Name $rgname -Force	
+	}	
+}

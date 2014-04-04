@@ -37,7 +37,7 @@ function Test-ValidateDeployment
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }
 
@@ -66,6 +66,6 @@ function Test-NewDeploymentFromTemplateFile
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }

@@ -34,7 +34,7 @@ function Test-CreatesNewSimpleResourceGroup
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }
 
@@ -93,5 +93,5 @@ function Test-RemoveNonExistingResourceGroup
 	# Setup
 	$rgname = Get-ResourceGroupName
 
-	Assert-Throws { Remove-AzureResourceGroup -Name $rgname -Force } "Provided resource group does not exist."
+	Assert-Throws { Clean-ResourceGroup $rgname } "Provided resource group does not exist."
 }

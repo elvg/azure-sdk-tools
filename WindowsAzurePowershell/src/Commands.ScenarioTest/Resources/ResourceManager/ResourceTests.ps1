@@ -45,7 +45,7 @@ function Test-CreatesNewSimpleResource
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }
 
@@ -101,7 +101,7 @@ function Test-CreatesNewComplexResource
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }
 
@@ -142,7 +142,7 @@ function Test-GetResourcesViaPiping
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }
 
@@ -170,7 +170,7 @@ function Test-GetResourcesFromEmptyGroup
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }
 
@@ -225,7 +225,7 @@ function Test-GetResourceForNonExisingResource
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }
 
@@ -260,6 +260,6 @@ function Test-GetResourcesViaPipingFromAnotherResource
 	finally
 	{
 		# Cleanup
-		Remove-AzureResourceGroup -Name $rgname -Force
+		Clean-ResourceGroup $rgname
 	}
 }

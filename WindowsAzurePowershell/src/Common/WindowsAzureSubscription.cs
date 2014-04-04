@@ -34,13 +34,15 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
     public class WindowsAzureSubscription
     {
         private bool registerProvidersOnCreateClient;
+        private bool addRestLogHandlerToAllClients;
 
-        public WindowsAzureSubscription() : this(true)
+        public WindowsAzureSubscription() : this(true, true)
         { }
 
-        public WindowsAzureSubscription(bool registerProviders)
+        public WindowsAzureSubscription(bool registerProviders, bool addRestLogHandler)
         {
             registerProvidersOnCreateClient = registerProviders;
+            addRestLogHandlerToAllClients = addRestLogHandler;
         }
 
         public string SubscriptionName { get; set; }
@@ -234,12 +236,20 @@ namespace Microsoft.WindowsAzure.Commands.Utilities.Common
                 client = (TClient)args.CreatedClient;
             }
 
-            // Add the logging handler
-            var withHandlerMethod = typeof(TClient).GetMethod("WithHandler", new[] { typeof(DelegatingHandler) });
-            TClient finalClient = (TClient)withHandlerMethod.Invoke(client, new object[] { new HttpRestCallLogger() });
-            client.Dispose();
+            if (addRestLogHandlerToAllClients)
+            {
+                // Add the logging handler
+                var withHandlerMethod = typeof (TClient).GetMethod("WithHandler", new[] {typeof (DelegatingHandler)});
+                TClient finalClient =
+                    (TClient) withHandlerMethod.Invoke(client, new object[] {new HttpRestCallLogger()});
+                client.Dispose();
 
-            return finalClient;
+                return finalClient;
+            }
+            else
+            {
+                return client;
+            }
         }
 
         private void RegisterRequiredResourceProviders<T>(SubscriptionCloudCredentials credentials) where T : ServiceClient<T>

@@ -44,9 +44,24 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         private HttpMockServer() { }
 
+        public static void Initialize(Type callerIdentity, string testIdentity)
+        {
+            Initialize(callerIdentity, testIdentity, GetCurrentMode());
+        }
+
+        public static void Initialize(string callerIdentity, string testIdentity)
+        {
+            Initialize(callerIdentity, testIdentity, GetCurrentMode());
+        }
+
         public static void Initialize(Type callerIdentity, string testIdentity, HttpRecorderMode mode)
         {
-            CallerIdentity = callerIdentity.Name;
+            Initialize(callerIdentity.Name, testIdentity, mode);
+        }
+
+        public static void Initialize(string callerIdentity, string testIdentity, HttpRecorderMode mode)
+        {
+            CallerIdentity = callerIdentity;
             TestIdentity = testIdentity;
             Mode = mode;
             names = new AssetNames();
@@ -73,11 +88,6 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             }
 
             initialized = true;
-        }
-
-        public static void Initialize(Type callerIdentity, string testIdentity)
-        {
-            Initialize(callerIdentity, testIdentity, GetCurrentMode());
         }
 
         public static HttpMockServer CreateInstance()
@@ -117,6 +127,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             }
         }
 
+        private static Random randomGenerator = new Random();
         public static string GetAssetName(string testName, string prefix)
         {
             if (Mode == HttpRecorderMode.Playback)
@@ -125,16 +136,19 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
             }
             else
             {
-                string generated = prefix + new Random().Next(9999);
+                string generated = prefix + randomGenerator.Next(9999);
 
-                if (names.ContainsKey(testName))
+                if (Mode == HttpRecorderMode.Record)
                 {
-                    while (names[testName].Any(n => n.Equals(generated)))
+                    if (names.ContainsKey(testName))
                     {
-                        generated = prefix + new Random().Next(9999);
+                        while (names[testName].Any(n => n.Equals(generated)))
+                        {
+                            generated = prefix + randomGenerator.Next(9999);
+                        }
                     }
+                    names.Enqueue(testName, generated);
                 }
-                names.Enqueue(testName, generated);
 
                 return generated;
             }

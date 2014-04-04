@@ -91,7 +91,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
             WindowsAzureProfile.Instance.CurrentEnvironment.ServiceEndpoint =
                 rdfeEnvironment.BaseUri.AbsoluteUri;
 
-            var newSubscription = new WindowsAzureSubscription(false)
+            var newSubscription = new WindowsAzureSubscription(false, false)
             {
                 SubscriptionId = csmEnvironment.SubscriptionId,
                 ActiveDirectoryEndpoint =
@@ -99,10 +99,10 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
                 ActiveDirectoryUserId = csmEnvironment.UserName,
                 SubscriptionName = csmEnvironment.SubscriptionId,
                 ServiceEndpoint = new Uri(WindowsAzureProfile.Instance.CurrentEnvironment.ServiceEndpoint),
-                ResourceManagerEndpoint =
-                    new Uri(WindowsAzureProfile.Instance.CurrentEnvironment.ResourceManagerEndpoint),
+                ResourceManagerEndpoint = new Uri(WindowsAzureProfile.Instance.CurrentEnvironment.ResourceManagerEndpoint),
                 TokenProvider = WindowsAzureProfile.Instance.TokenProvider,
                 GalleryEndpoint = new Uri(WindowsAzureProfile.Instance.CurrentEnvironment.GalleryEndpoint),
+                CurrentStorageAccountName = csmEnvironment.StorageAccount,
                 IsDefault = true
             };
             if (recordingMode == HttpRecorderMode.Playback)
