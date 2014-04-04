@@ -1,1 +1,81 @@
-{"Entries":[{"RequestUri":"/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk6626?api-version=2014-04-01-preview","RequestMethod":"HEAD","RequestBody":"","RequestHeaders":{"User-Agent":["Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0","WindowsAzurePowershell/v0.8.0"]},"ResponseBody":"","ResponseHeaders":{"Pragma":["no-cache"],"x-ms-request-id":["324c2446-31d0-43c8-9dd4-a6205ccc6cc5"],"x-ms-correlation-request-id":["324c2446-31d0-43c8-9dd4-a6205ccc6cc5"],"x-ms-routing-request-id":["CENTRALUS:20140403T003343Z:324c2446-31d0-43c8-9dd4-a6205ccc6cc5"],"Cache-Control":["no-cache"],"Date":["Thu, 03 Apr 2014 00:33:42 GMT"],"Server":["Microsoft-IIS/8.5"]},"StatusCode":404},{"RequestUri":"/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk6626?api-version=2014-04-01-preview","RequestMethod":"PUT","RequestBody":"{\r\n  \"location\": \"non-existing\"\r\n}","RequestHeaders":{"User-Agent":["Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0","WindowsAzurePowershell/v0.8.0"]},"ResponseBody":"{\r\n  \"error\": {\r\n    \"code\": \"InvalidResourceLocation\",\r\n    \"message\": \"The provided location 'non-existing' is not supported. List of available regions is 'centralus, eastasia, southeastasia, eastus, westus, northcentralus, southcentralus, northeurope, westeurope'\"\r\n  }\r\n}","ResponseHeaders":{"Pragma":["no-cache"],"x-ms-request-id":["4bf5c4b5-76b6-43d8-8d9d-99678c71b93e"],"x-ms-correlation-request-id":["4bf5c4b5-76b6-43d8-8d9d-99678c71b93e"],"x-ms-routing-request-id":["CENTRALUS:20140403T003343Z:4bf5c4b5-76b6-43d8-8d9d-99678c71b93e"],"Cache-Control":["no-cache"],"Date":["Thu, 03 Apr 2014 00:33:43 GMT"],"Server":["Microsoft-IIS/8.5"]},"StatusCode":400}],"Names":{"Test-NewResourceGroupInNonExistingLocation":["onesdk6626"]}}
+{
+  "Entries": [
+    {
+      "RequestUri": "/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk6626?api-version=2014-04-01-preview",
+      "RequestMethod": "HEAD",
+      "RequestBody": "",
+      "RequestHeaders": {
+        "User-Agent": [
+          "Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0",
+          "WindowsAzurePowershell/v0.8.0"
+        ]
+      },
+      "ResponseBody": "",
+      "ResponseHeaders": {
+        "Pragma": [
+          "no-cache"
+        ],
+        "x-ms-request-id": [
+          "324c2446-31d0-43c8-9dd4-a6205ccc6cc5"
+        ],
+        "x-ms-correlation-request-id": [
+          "324c2446-31d0-43c8-9dd4-a6205ccc6cc5"
+        ],
+        "x-ms-routing-request-id": [
+          "CENTRALUS:20140403T003343Z:324c2446-31d0-43c8-9dd4-a6205ccc6cc5"
+        ],
+        "Cache-Control": [
+          "no-cache"
+        ],
+        "Date": [
+          "Thu, 03 Apr 2014 00:33:42 GMT"
+        ],
+        "Server": [
+          "Microsoft-IIS/8.5"
+        ]
+      },
+      "StatusCode": 404
+    },
+    {
+      "RequestUri": "/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk6626?api-version=2014-04-01-preview",
+      "RequestMethod": "PUT",
+      "RequestBody": "{\r\n  \"location\": \"non-existing\"\r\n}",
+      "RequestHeaders": {
+        "User-Agent": [
+          "Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0",
+          "WindowsAzurePowershell/v0.8.0"
+        ]
+      },
+      "ResponseBody": "{\r\n  \"error\": {\r\n    \"code\": \"InvalidResourceLocation\",\r\n    \"message\": \"The provided location 'non-existing' is not supported. List of available regions is 'centralus, eastasia, southeastasia, eastus, westus, northcentralus, southcentralus, northeurope, westeurope'\"\r\n  }\r\n}",
+      "ResponseHeaders": {
+        "Pragma": [
+          "no-cache"
+        ],
+        "x-ms-request-id": [
+          "4bf5c4b5-76b6-43d8-8d9d-99678c71b93e"
+        ],
+        "x-ms-correlation-request-id": [
+          "4bf5c4b5-76b6-43d8-8d9d-99678c71b93e"
+        ],
+        "x-ms-routing-request-id": [
+          "CENTRALUS:20140403T003343Z:4bf5c4b5-76b6-43d8-8d9d-99678c71b93e"
+        ],
+        "Cache-Control": [
+          "no-cache"
+        ],
+        "Date": [
+          "Thu, 03 Apr 2014 00:33:43 GMT"
+        ],
+        "Server": [
+          "Microsoft-IIS/8.5"
+        ]
+      },
+      "StatusCode": 400
+    }
+  ],
+  "Names": {
+    "Test-NewResourceGroupInNonExistingLocation": [
+      "onesdk6626"
+    ]
+  }
+}

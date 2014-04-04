@@ -107,7 +107,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 
         public static void SerializeJson<T>(T data, string path)
         {
-            File.WriteAllText(path, JsonConvert.SerializeObject(data, Formatting.None, new JsonSerializerSettings
+            File.WriteAllText(path, JsonConvert.SerializeObject(data, Formatting.Indented, new JsonSerializerSettings
                 {
                     TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
                     TypeNameHandling = TypeNameHandling.None

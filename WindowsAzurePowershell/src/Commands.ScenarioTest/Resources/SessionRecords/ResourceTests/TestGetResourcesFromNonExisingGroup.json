@@ -1,1 +1,45 @@
-{"Entries":[{"RequestUri":"/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk2094?api-version=2014-04-01-preview","RequestMethod":"HEAD","RequestBody":"","RequestHeaders":{"User-Agent":["Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0","WindowsAzurePowershell/v0.8.0"]},"ResponseBody":"","ResponseHeaders":{"Pragma":["no-cache"],"x-ms-request-id":["d3126f84-3bad-42f6-826c-3109c48869ee"],"x-ms-correlation-request-id":["d3126f84-3bad-42f6-826c-3109c48869ee"],"x-ms-routing-request-id":["CENTRALUS:20140403T003339Z:d3126f84-3bad-42f6-826c-3109c48869ee"],"Cache-Control":["no-cache"],"Date":["Thu, 03 Apr 2014 00:33:39 GMT"],"Server":["Microsoft-IIS/8.5"]},"StatusCode":404}],"Names":{"Test-GetResourcesFromNonExisingGroup":["onesdk2094"]}}
+{
+  "Entries": [
+    {
+      "RequestUri": "/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk2094?api-version=2014-04-01-preview",
+      "RequestMethod": "HEAD",
+      "RequestBody": "",
+      "RequestHeaders": {
+        "User-Agent": [
+          "Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0",
+          "WindowsAzurePowershell/v0.8.0"
+        ]
+      },
+      "ResponseBody": "",
+      "ResponseHeaders": {
+        "Pragma": [
+          "no-cache"
+        ],
+        "x-ms-request-id": [
+          "d3126f84-3bad-42f6-826c-3109c48869ee"
+        ],
+        "x-ms-correlation-request-id": [
+          "d3126f84-3bad-42f6-826c-3109c48869ee"
+        ],
+        "x-ms-routing-request-id": [
+          "CENTRALUS:20140403T003339Z:d3126f84-3bad-42f6-826c-3109c48869ee"
+        ],
+        "Cache-Control": [
+          "no-cache"
+        ],
+        "Date": [
+          "Thu, 03 Apr 2014 00:33:39 GMT"
+        ],
+        "Server": [
+          "Microsoft-IIS/8.5"
+        ]
+      },
+      "StatusCode": 404
+    }
+  ],
+  "Names": {
+    "Test-GetResourcesFromNonExisingGroup": [
+      "onesdk2094"
+    ]
+  }
+}

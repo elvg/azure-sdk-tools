@@ -1,1 +1,45 @@
-{"Entries":[{"RequestUri":"/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk969?api-version=2014-04-01-preview","RequestMethod":"GET","RequestBody":"","RequestHeaders":{"User-Agent":["Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0","WindowsAzurePowershell/v0.8.0"]},"ResponseBody":"{\r\n  \"error\": {\r\n    \"code\": \"ResourceGroupNotFound\",\r\n    \"message\": \"Resource group 'onesdk969' could not be found.\"\r\n  }\r\n}","ResponseHeaders":{"Pragma":["no-cache"],"x-ms-request-id":["7e4843eb-208d-44e7-8aa5-c52330195740"],"x-ms-correlation-request-id":["7e4843eb-208d-44e7-8aa5-c52330195740"],"x-ms-routing-request-id":["CENTRALUS:20140403T004030Z:7e4843eb-208d-44e7-8aa5-c52330195740"],"Cache-Control":["no-cache"],"Date":["Thu, 03 Apr 2014 00:40:30 GMT"],"Server":["Microsoft-IIS/8.5"]},"StatusCode":404}],"Names":{"Test-GetNonExistingResourceGroup":["onesdk969"]}}
+{
+  "Entries": [
+    {
+      "RequestUri": "/subscriptions/0a496442-635f-4974-bda4-2d339b9a6b3c/resourcegroups/onesdk969?api-version=2014-04-01-preview",
+      "RequestMethod": "GET",
+      "RequestBody": "",
+      "RequestHeaders": {
+        "User-Agent": [
+          "Microsoft.Azure.Management.Resources.ResourceManagementClient/2.0.0.0",
+          "WindowsAzurePowershell/v0.8.0"
+        ]
+      },
+      "ResponseBody": "{\r\n  \"error\": {\r\n    \"code\": \"ResourceGroupNotFound\",\r\n    \"message\": \"Resource group 'onesdk969' could not be found.\"\r\n  }\r\n}",
+      "ResponseHeaders": {
+        "Pragma": [
+          "no-cache"
+        ],
+        "x-ms-request-id": [
+          "7e4843eb-208d-44e7-8aa5-c52330195740"
+        ],
+        "x-ms-correlation-request-id": [
+          "7e4843eb-208d-44e7-8aa5-c52330195740"
+        ],
+        "x-ms-routing-request-id": [
+          "CENTRALUS:20140403T004030Z:7e4843eb-208d-44e7-8aa5-c52330195740"
+        ],
+        "Cache-Control": [
+          "no-cache"
+        ],
+        "Date": [
+          "Thu, 03 Apr 2014 00:40:30 GMT"
+        ],
+        "Server": [
+          "Microsoft-IIS/8.5"
+        ]
+      },
+      "StatusCode": 404
+    }
+  ],
+  "Names": {
+    "Test-GetNonExistingResourceGroup": [
+      "onesdk969"
+    ]
+  }
+}
