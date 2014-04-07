@@ -52,9 +52,6 @@
     <Reference Include="Microsoft.Azure.Gallery">
       <HintPath>..\packages\Microsoft.Azure.Gallery.2.0.0-preview\lib\net40\Microsoft.Azure.Gallery.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Azure.Management.Resources">
-      <HintPath>..\packages\Microsoft.Azure.Management.Resources.2.0.0-preview\lib\net40\Microsoft.Azure.Management.Resources.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Azure.Monitoring, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Azure.Monitoring.2.0.1-preview\lib\net40\Microsoft.Azure.Monitoring.dll</HintPath>

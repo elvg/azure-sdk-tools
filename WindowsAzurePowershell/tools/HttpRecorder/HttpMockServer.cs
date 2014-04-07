@@ -24,6 +24,7 @@ namespace Microsoft.WindowsAzure.Utilities.HttpRecorder
 {
     public class HttpMockServer : DelegatingHandler
     {
+        // One of the enum values for HttpRecorderMode such as Record or Playback
         private const string modeEnvironmentVariableName = "AZURE_TEST_MODE";
         private static AssetNames names;
         private static Records records;

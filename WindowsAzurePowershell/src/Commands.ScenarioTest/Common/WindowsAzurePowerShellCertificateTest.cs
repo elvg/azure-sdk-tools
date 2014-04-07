@@ -28,6 +28,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
         protected TestCredentialHelper credentials;
         protected string credentialFile;
         protected string profileFile;
+        // Location where test output will be written to e.g. C:\Temp
         private static string outputDirKey = "TEST_HTTPMOCK_OUTPUT";
 
         private void OnClientCreated(object sender, ClientCreatedArgs e)

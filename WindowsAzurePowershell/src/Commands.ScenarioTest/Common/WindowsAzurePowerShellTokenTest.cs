@@ -30,6 +30,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
     public class WindowsAzurePowerShellTokenTest : PowerShellTest
     {
         private static string testEnvironmentName = "__test-environment";
+        // Location where test output will be written to e.g. C:\Temp
         private static string outputDirKey = "TEST_HTTPMOCK_OUTPUT";
         private HttpRecorderMode recordingMode = HttpRecorderMode.Playback;
 
