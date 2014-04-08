@@ -46,6 +46,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         [TestMethod]
         [TestCategory(Category.All)]
         [TestCategory(Category.ResourceManager)]
+        [TestCategory(Category.CheckIn)]
         public void TestCreatesNewSimpleResourceGroup()
         {
             RunPowerShellTest("Test-CreatesNewSimpleResourceGroup");
@@ -54,6 +55,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         [TestMethod]
         [TestCategory(Category.All)]
         [TestCategory(Category.ResourceManager)]
+        [TestCategory(Category.CheckIn)]
         public void TestCreatesAndRemoveResourceGroupViaPiping()
         {
             RunPowerShellTest("Test-CreatesAndRemoveResourceGroupViaPiping");
@@ -62,6 +64,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         [TestMethod]
         [TestCategory(Category.All)]
         [TestCategory(Category.ResourceManager)]
+        [TestCategory(Category.CheckIn)]
         public void TestGetNonExistingResourceGroup()
         {
             RunPowerShellTest("Test-GetNonExistingResourceGroup");
@@ -70,6 +73,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         [TestMethod]
         [TestCategory(Category.All)]
         [TestCategory(Category.ResourceManager)]
+        [TestCategory(Category.CheckIn)]
         public void TestNewResourceGroupInNonExistingLocation()
         {
             RunPowerShellTest("Test-NewResourceGroupInNonExistingLocation");
@@ -78,6 +82,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.ResourceManagerTests
         [TestMethod]
         [TestCategory(Category.All)]
         [TestCategory(Category.ResourceManager)]
+        //[TestCategory(Category.CheckIn)]
         public void TestRemoveNonExistingResourceGroup()
         {
             RunPowerShellTest("Test-RemoveNonExistingResourceGroup");

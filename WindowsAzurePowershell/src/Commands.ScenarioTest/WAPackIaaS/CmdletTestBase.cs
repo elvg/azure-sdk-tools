@@ -29,6 +29,7 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.WAPackIaaS.FunctionalTest
     /// object for every test method and handles the clean-up automatically.  Use the <value>this.PowerShell</value>
     /// property and add commands and parameters; exactly how you can invoke cmdlets from code.
     /// </summary>
+    [TestClass]
     public class CmdletTestBase
     {
         private static string CmdletAssemblyPath = typeof(WAPackOperationException).Assembly.Location;

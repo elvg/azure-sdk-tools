@@ -30,6 +30,7 @@
     <SetupOutputDirectory>$(PublishDirectory)\Setup</SetupOutputDirectory>
     <TestFilter>"!Functional&#x26;!Scenario&#x26;!Sequential&#x26;!PIRTest&#x26;!Preview&#x26;!ADDomain"</TestFilter>
     <ScenarioTestFilter>All</ScenarioTestFilter>
+	<MockTestFilter>CheckIn</MockTestFilter>
 	<OneSDKCITFilter>"OneSDK&#x26;CIT"</OneSDKCITFilter>
 	<AzureRTAllTestFilter>"Functional|Scenario"</AzureRTAllTestFilter>
 	<AzureRTAllTestFilter2>"Functional|Scenario|Preview"</AzureRTAllTestFilter2>
@@ -237,7 +238,7 @@
 
     <Message Importance="high" Text="Debug tests:" />
     <!--CallTarget Targets="TestManagement; TestResourceManager; TestServiceManagement; TestSqlDatabase; TestStorage;" /-->
-    <CallTarget Targets="TestManagement; TestResourceManager; TestServiceManagement; TestStorage;" />
+    <CallTarget Targets="TestManagement; TestResourceManager; TestServiceManagement; TestStorage; MockedScenarioTests" />
   </Target>
 
   <Target Name="TestManagement">
@@ -287,6 +288,18 @@
     <Exec
       Command="MSTest.exe /testcontainer:$(StorageScenarioTestDebug) /testsettings:$(TestSettings) /category:$(ScenarioTestFilter) /resultsfile:$(TestOutputDirectory)\StorageScenarioDebug.trx"
       ContinueOnError="false" />
+  </Target>
+  
+  <!-- Run the scenario tests with Mocks -->
+  <Target Name="MockedScenarioTests" DependsOnTargets="Clean;BuildDebug">
+    <Message Importance="high" Text="Running scenario tests with Mocks..." />
+    <Message Importance="high" Text="You are required to have installed a version of Visual Studio with support for MSTest (and MSTest on your path)." />
+    <MakeDir Directories="$(TestOutputDirectory)" ContinueOnError="false" />
+
+    <Message Importance="high" Text="Scenario tests:" />
+    <Exec
+      Command="MSTest.exe /testcontainer:$(ScenarioTestDebug) /testsettings:$(TestSettings) /category:$(MockTestFilter) /resultsfile:$(TestOutputDirectory)\ScenarioTests.trx"
+      ContinueOnError="false" />    
   </Target>
 
   <!-- Run the CITs -->
