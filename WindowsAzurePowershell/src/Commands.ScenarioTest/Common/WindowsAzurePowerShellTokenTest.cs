@@ -42,7 +42,10 @@ namespace Microsoft.WindowsAzure.Commands.ScenarioTest.Common
         public WindowsAzurePowerShellTokenTest(params string[] modules)
             : base(modules)
         {
-            HttpMockServer.RecordsDirectory = Environment.GetEnvironmentVariable(outputDirKey);
+            if (Environment.GetEnvironmentVariable(outputDirKey) != null)
+            {
+                HttpMockServer.RecordsDirectory = Environment.GetEnvironmentVariable(outputDirKey);
+            }
         }
 
         public override Collection<PSObject> RunPowerShellTest(params string[] scripts)
