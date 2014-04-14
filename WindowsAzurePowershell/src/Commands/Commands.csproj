@@ -285,6 +285,28 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Automation\AzureAutomationBaseCmdlet.cs" />
+    <Compile Include="Automation\GetAzureAutomationAccount.cs" />
+    <Compile Include="Automation\GetAzureAutomationJob.cs" />
+    <Compile Include="Automation\GetAzureAutomationJobOutput.cs" />
+    <Compile Include="Automation\GetAzureAutomationRunbook.cs" />
+    <Compile Include="Automation\GetAzureAutomationRunbookDefinition.cs" />
+    <Compile Include="Automation\GetAzureAutomationSchedule.cs" />
+    <Compile Include="Automation\NewAzureAutomationRunbook.cs" />
+    <Compile Include="Automation\NewAzureAutomationSchedule.cs" />
+    <Compile Include="Automation\PublishAzureAutomationRunbook.cs" />
+    <Compile Include="Automation\RegisterAzureAutomationScheduledRunbook.cs" />
+    <Compile Include="Automation\RemoveAzureAutomationRunbook.cs" />
+    <Compile Include="Automation\RemoveAzureAutomationSchedule.cs" />
+    <Compile Include="Automation\ResumeAzureAutomationJob.cs" />
+    <Compile Include="Automation\SetAzureAutomationRunbook.cs" />
+    <Compile Include="Automation\SetAzureAutomationRunbookDefinition.cs" />
+    <Compile Include="Automation\SetAzureAutomationSchedule.cs" />
+    <Compile Include="Automation\StartAzureAutomationRunbook.cs" />
+    <Compile Include="Automation\StartAzureAutomationRunbookBase.cs" />
+    <Compile Include="Automation\StopAzureAutomationJob.cs" />
+    <Compile Include="Automation\SuspendAzureAutomationJob.cs" />
+    <Compile Include="Automation\UnregisterAzureAutomationScheduledRunbook.cs" />
     <Compile Include="CloudService\Development\DisableAzureRemoteDesktop.cs" />
     <Compile Include="CloudService\Development\EnableAzureMemcacheRole.cs" />
     <Compile Include="CloudService\Development\EnableAzureRemoteDesktop.cs" />

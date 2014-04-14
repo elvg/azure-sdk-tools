@@ -172,6 +172,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutomationTests\AutomationTests.cs" />
     <Compile Include="CloudServiceTests\PublishAzureServiceScenarioTests.cs" />
     <Compile Include="CloudServiceTests\StartAzureServiceScenarioTests.cs" />
     <Compile Include="CloudServiceTests\StopAzureServiceScenarioTests.cs" />
@@ -241,6 +242,13 @@
     <Resource Include="Resources\ResourceManager\ResourceGroupTests.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <None Include="Resources\Automation\AutomationTests.ps1" />
+    <None Include="Resources\Automation\fastJob.ps1" />
+    <None Include="Resources\Automation\Test-Workflow.ps1" />
+    <None Include="Resources\Automation\Test-WorkflowV2.ps1" />
+    <None Include="Resources\Automation\Test-WorkFlowWithVariousParameters.ps1" />
+    <None Include="Resources\Automation\Use-WorkflowCheckpointSample.ps1" />
+    <None Include="Resources\Automation\Write-DebugAndVerboseOutput.ps1" />
     <None Include="Resources\Build2014_Website_App.json" />
     <Resource Include="Resources\ResourceManager\DeploymentTests.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
