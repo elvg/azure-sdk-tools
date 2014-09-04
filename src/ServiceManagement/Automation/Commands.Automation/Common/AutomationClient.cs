@@ -885,12 +885,21 @@ namespace Microsoft.Azure.Commands.Automation.Common
                 if (parameters.Contains(runbookParameter.Name))
                 {
                     object paramValue = parameters[runbookParameter.Name];
-                    filteredParameters.Add(
-                        new AutomationManagement.Models.NameValuePair
-                        {
-                            Name = runbookParameter.Name,
-                            Value = JsonConvert.SerializeObject(paramValue, new JsonSerializerSettings() { DateFormatHandling = DateFormatHandling.MicrosoftDateFormat })
-                        });
+                    try
+                    {
+                        filteredParameters.Add(
+                            new AutomationManagement.Models.NameValuePair
+                            {
+                                Name = runbookParameter.Name,
+                                Value = JsonConvert.SerializeObject(paramValue, new JsonSerializerSettings() { DateFormatHandling = DateFormatHandling.MicrosoftDateFormat })
+                            });
+                    }
+                    catch (JsonSerializationException)
+                    {
+                        throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture, Resources.RunbookParameterCannotBeSerializedToJson, runbookParameter.Name));
+                    }
                 }
                 else if (runbookParameter.IsMandatory)
                 {

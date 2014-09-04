@@ -177,6 +177,10 @@
     <value>The runbook was not found. Runbook name: {0}.</value>
     <comment>Automation</comment>
   </data>
+  <data name="RunbookParameterCannotBeSerializedToJson" xml:space="preserve">
+    <value>The runbook parameter "{0}" cannot be serialized to JSON.</value>
+    <comment>Automation</comment>
+  </data>
   <data name="RunbookParameterValueRequired" xml:space="preserve">
     <value>The runbook parameter "{0}" is mandatory.</value>
     <comment>Automation</comment>

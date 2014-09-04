@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Commands.Automation.Properties
-{
-
-
+namespace Microsoft.Azure.Commands.Automation.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -192,6 +192,15 @@ namespace Microsoft.Azure.Commands.Automation.Properties
         internal static string RunbookNotFoundByName {
             get {
                 return ResourceManager.GetString("RunbookNotFoundByName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The runbook parameter &quot;{0}&quot; cannot be serialized to JSON..
+        /// </summary>
+        internal static string RunbookParameterCannotBeSerializedToJson {
+            get {
+                return ResourceManager.GetString("RunbookParameterCannotBeSerializedToJson", resourceCulture);
             }
         }
         
