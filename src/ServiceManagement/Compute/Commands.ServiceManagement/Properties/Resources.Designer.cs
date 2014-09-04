@@ -1823,6 +1823,15 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Subnet should be specified when deploying VMs in a VNET: {0}.
+        /// </summary>
+        public static string SubnetShouldBeSpecifiedIfVnetPresent {
+            get {
+                return ResourceManager.GetString("SubnetShouldBeSpecifiedIfVnetPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to decode string from base 64. Please make sure the string is correctly encoded: {0}..
         /// </summary>
         public static string UnableToDecodeBase64String {

@@ -32,9 +32,9 @@ namespace Microsoft.WindowsAzure.Commands.Common
 
         public const string AssemblyCopyright = "Copyright © Microsoft";
 
-        public const string AssemblyVersion = "0.8.7";
+        public const string AssemblyVersion = "0.8.7.1";
 
-        public const string AssemblyFileVersion = "0.8.7";
+        public const string AssemblyFileVersion = "0.8.7.1";
 
         public static AzureProfile Profile
         {

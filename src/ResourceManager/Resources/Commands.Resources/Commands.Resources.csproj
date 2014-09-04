@@ -48,13 +48,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Azure.Gallery, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\packages\Microsoft.Azure.Gallery.2.1.1-preview\lib\net40\Microsoft.Azure.Gallery.dll</HintPath>
+    <Reference Include="Microsoft.Azure.Gallery">
+      <HintPath>..\..\..\packages\Microsoft.Azure.Gallery.2.2.0-preview\lib\net40\Microsoft.Azure.Gallery.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Azure.Monitoring, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\packages\Microsoft.Azure.Monitoring.2.1.1-preview\lib\net40\Microsoft.Azure.Monitoring.dll</HintPath>
+    <Reference Include="Microsoft.Azure.Monitoring">
+      <HintPath>..\..\..\packages\Microsoft.Azure.Monitoring.2.2.0-preview\lib\net40\Microsoft.Azure.Monitoring.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.ResourceManager, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

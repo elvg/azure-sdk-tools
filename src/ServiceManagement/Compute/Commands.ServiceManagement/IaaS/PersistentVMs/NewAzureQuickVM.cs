@@ -558,6 +558,11 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.IaaS.PersistentVMs
                 throw new ArgumentException(Resources.VNetNameRequiredWhenSpecifyingDNSSettings);
             }
 
+            if (!string.IsNullOrEmpty(this.VNetName) && (this.SubnetNames == null || this.SubnetNames.Length == 0))
+            {
+                WriteWarning(Resources.SubnetShouldBeSpecifiedIfVnetPresent);
+            }
+
             if (this.ParameterSetName.Contains(LinuxParamSet) && this.Password != null && !ValidationHelpers.IsLinuxPasswordValid(this.Password))
             {
                 throw new ArgumentException(Resources.PasswordNotComplexEnough);
